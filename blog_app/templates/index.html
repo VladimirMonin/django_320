@@ -7,6 +7,24 @@
 </head>
 <body>
     <h1>Главная страница</h1>
-    <p>Привет, {{ name }}!</p>
+    <p> строка: {{ some_str }} </p>
+    <p> число: {{ some_int }} </p>
+    <p> список: {{ some_list }} </p>
+    <p> список: {{ some_list.0 }} </p>
+    <p> словарь: {{ some_dict }} </p>
+    <p>словарь, ключ: {{ some_dict.fruit }} </p>
+    <p> объект: {{ data }} </p>
+    <p> объект.поле: {{ data.name }} </p>
+    <p> объект.метод: {{ data.method }} </p>
+    
+    <script>
+        {% comment %} 
+        Попробуем на JS достать содержимое переменной some_str
+        и вывести его в консоль браузера.
+        {% endcomment %}
+
+        let someStr = "{{ some_str }}";
+        console.log(someStr);
+    </script>
 </body>
 </html>

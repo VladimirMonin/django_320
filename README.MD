@@ -94,3 +94,16 @@ def index(request):
 ```
 
 Коммит: **Создание первого шаблона**
+
+### Первая переменная шаблона
+
+Добавили переменную `{{name}} в index.html`
+Добавили передачу контекста в шаблон
+
+```python
+def index(request):
+    context = {'name': 'Zigmund'}
+    return render(request, 'index.html', context=context)
+```
+
+Коммит: **Создание первой переменной шаблона**

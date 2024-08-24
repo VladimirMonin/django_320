@@ -77,3 +77,20 @@ urlpatterns = [
 ```
 
 Коммит: **Создание первого view**
+
+## Знакомство с Шаблонизатором Django
+
+1. Создаём папку `templates` в директории `blog_app`
+2. Размещаем в ней файл `index.html` (Простой HTML-файл с заголовком 1 уровня)
+3. Изменяем `views.py`. Используя функцию `render` из `django.shortcuts` передаём в неё `request` и `index.html`
+
+```python
+from django.shortcuts import render
+
+
+def index(request):
+    return render(request, 'index.html')
+
+```
+
+Коммит: **Создание первого шаблона**

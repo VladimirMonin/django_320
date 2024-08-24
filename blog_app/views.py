@@ -1,3 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 
-# Create your views here.
+# Index - функция, которая будет отдавать HttpResponse с текстом "Привет из Django!"
+def index(request):
+    return HttpResponse("Привет из Django!")

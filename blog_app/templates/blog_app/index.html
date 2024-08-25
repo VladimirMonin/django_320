@@ -25,8 +25,16 @@ comments: список словарей:
     {% comment %} Цикл шаблона {% endcomment %}
 
     {% for post in posts %}
+
+    
+    
     <hr>
     <p>Title: {{ post.title }}</p>
+    {% if post.is_published == True %}
+    <p style="color: green;">Published</p>
+    {% else %}
+    <p style="color: red;">Не опубликовано</p>
+    {% endif %}
     <p>Slug: {{ post.slug }}</p>
     {% comment %} Захардкодили ссылку. Если маршрут поменятся надо будет везде править руками {% endcomment %}
     <a href="post/{{ post.slug }}">{{ post.title }}</a>
@@ -36,6 +44,7 @@ comments: список словарей:
     <p>Ссылка с использованием шаблонного тега <code>url</code>:</p>
     <a href = {% url 'post_by_slug' post.slug %}>{{ post.title }}</a>
     <hr>
+    
     {% endfor %}
     
     <script>

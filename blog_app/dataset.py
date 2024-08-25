@@ -4,7 +4,7 @@ dataset = [
         "slug": "chto-novogo-v-python-310",
         "post": "В версии Python 3.10 появилось множество улучшений и новых функций. Например, улучшенные операторы сравнения и структурированное сопоставление с образцом.",
         "hashtags": ["python", "новости", "выпуск"],
-        "is_published": True,
+        "is_published": False,
         "views": 5832,
         "likes": 142,
         "comments": [
@@ -17,7 +17,7 @@ dataset = [
         "slug": "django-osnovnye-komandy",
         "post": "Django предоставляет множество встроенных команд для работы с проектом. Например, команды для миграций, создания суперпользователей, и очистки кеша.",
         "hashtags": ["django", "команды", "быстрый старт"],
-        "is_published": True,
+        "is_published": False,
         "views": 4901,
         "likes": 85,
         "comments": [

@@ -197,3 +197,39 @@ dataset = [
 ```
 
 Коммит: **Создание первого представления и датасета**
+
+### Сделали поиск по нашей "базе данных" по Slug и отдачу в шаблон
+
+Шаблон:
+
+```html
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+  </head>
+  <body>
+    <h1>{{title}}</h1>
+    <p>Текст поста: {{post}}</p>
+    <p>Теги: {{hashtags}}</p>
+    <p>Просмотры: {{views}}</p>
+    <p>Лайки: {{likes}}</p>
+  </body>
+</html>
+```
+
+Вью:
+
+```python
+def post_by_slug(request, post_slug):
+    # Проходим список словарей dataset и ищем совпадение по слагу
+    post = [post for post in dataset if post['slug'] == post_slug]
+    if not post:
+        # 404 - Пост не найден
+        return HttpResponse('404 - Пост не найден', status=404)
+    else:
+        return render(request, 'post_detail.html', context=post[0], status=200)
+```
+
+Коммит: **Поиск по слагу в dataset и передача в шаблон**

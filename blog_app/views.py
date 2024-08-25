@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse
-from dataset import dataset
+from .dataset import dataset
 
 class Data:
     def __init__(self, name):
@@ -24,8 +24,9 @@ def index(request):
 
 def post_by_slug(request, post_slug):
     # Проходим список словарей dataset и ищем совпадение по слагу
-    post = [post for post in dataset if post['slug'] == post_slug][0]
+    post = [post for post in dataset if post['slug'] == post_slug]
     if not post:
         # 404 - Пост не найден
         return HttpResponse('404 - Пост не найден', status=404)
-    pass
+    else:
+        return render(request, 'post_detail.html', context=post[0], status=200)

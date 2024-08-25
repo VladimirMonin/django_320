@@ -323,3 +323,19 @@ path('post/<slug:post_slug>', post_by_slug, name='post_by_slug'),
 И задали им определенный класс для оформления
 
 Коммит: **Вложенный цикл в шаблонах**
+
+## Подключение статики 
+
+1. Надо оформить 2 константы в `settings.py`
+
+```python
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+```
+
+2. Создать папку `static` в корне проекта
+3. Загрузить статику в нужные шаблоны `{% load static %}`
+4. Обратиться к нужному файлу допустим так `<link rel="stylesheet" href="{% static "css/main.css" %}" />`
+
+Коммит: **Подключение статики**

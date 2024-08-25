@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% comment %} 
+Ключи из словаря поста:
+title
+slug
+post
+hashtags: список
+is_published: bool
+views: int
+likes: int
+comments: список словарей:
+    username
+    text
+
+{% endcomment %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Каталог постов</h1>
+    
+    {% comment %} Цикл шаблона {% endcomment %}
+
+    {% for post in posts %}
+    <hr>
+    <p>Title: {{ post.title }}</p>
+    <p>Slug: {{ post.slug }}</p>
+    {% comment %} Захардкодили ссылку. Если маршрут поменятся надо будет везде править руками {% endcomment %}
+    <a href="post/{{ post.slug }}">{{ post.title }}</a>
+
+    {% comment %} Чтобы ссылку не хардкодить, мы используем псевдонимы
+    маршрутов {% endcomment %}
+    <p>Ссылка с использованием шаблонного тега <code>url</code>:</p>
+    <a href = {% url 'post_by_slug' post.slug %}>{{ post.title }}</a>
+    <hr>
+    {% endfor %}
+    
+    <script>
+        {% comment %} 
+        Попробуем на JS достать содержимое переменной some_str
+        и вывести его в консоль браузера.
+        {% endcomment %}
+
+        let someStr = "{{ some_str }}";
+        console.log(someStr);
+    </script>
+</body>
+</html>

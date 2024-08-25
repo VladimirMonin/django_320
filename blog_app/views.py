@@ -1,25 +1,12 @@
 from django.shortcuts import render, HttpResponse
 from .dataset import dataset
 
-class Data:
-    def __init__(self, name):
-        self.name = name
-        
-    def method(self):
-        return 'Вызов метода класса Data'
-
-
 # Index - функция, которая будет отдавать HttpResponse с текстом "Привет из Django!"
 def index(request):
-    
-    data_instance = Data('Гендальф')
-    
-    context = {'some_str': 'Тест JS переменной',
-               'some_int': 88,
-               'some_list': ['Один', 1],
-               'some_dict': {'fruit': 'apple'},
-               'data': data_instance}
-    return render(request, 'index.html', context=context)
+    context = {
+        'posts': dataset
+    }
+    return render(request, 'blog_app/index.html', context=context)
 
 
 def post_by_slug(request, post_slug):
@@ -29,4 +16,4 @@ def post_by_slug(request, post_slug):
         # 404 - Пост не найден
         return HttpResponse('404 - Пост не найден', status=404)
     else:
-        return render(request, 'post_detail.html', context=post[0], status=200)
+        return render(request, 'blog_app/post_detail.html', context=post[0], status=200)

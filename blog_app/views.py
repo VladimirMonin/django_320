@@ -21,3 +21,5 @@ def index(request):
     return render(request, 'index.html', context=context)
 
 
+def post_by_slug(request, post_slug):
+    return HttpResponse(f'Пост с названием {post_slug}')

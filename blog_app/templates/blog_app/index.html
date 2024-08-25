@@ -18,6 +18,19 @@ comments: список словарей:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        .hashtag {
+            display:inline-block;
+            background-color: #eee;
+            padding: 0.2em 0.5em;
+            border-radius: 0.2em;
+            border: 1px solid black;
+            box-shadow: 0 0 0.2em black;
+            font-size: 0.5em;
+            
+            
+        }
+    </style>
 </head>
 <body>
     <h1>Каталог постов</h1>
@@ -36,11 +49,13 @@ comments: список словарей:
     <p style="color: red;">Не опубликовано</p>
     {% endif %}
     <p>Slug: {{ post.slug }}</p>
-    {% comment %} Захардкодили ссылку. Если маршрут поменятся надо будет везде править руками {% endcomment %}
-    <a href="post/{{ post.slug }}">{{ post.title }}</a>
-
+    {% comment %} Вложенный цикл для отрисовки тегов {% endcomment %}
+    <p>{{ post.hashtags }}</p>
     {% comment %} Чтобы ссылку не хардкодить, мы используем псевдонимы
     маршрутов {% endcomment %}
+    {%for hashtag in post.hashtags %}
+    <p class='hashtag'>{{hashtag}}</p>
+    {% endfor %}
     <p>Ссылка с использованием шаблонного тега <code>url</code>:</p>
     <a href = {% url 'post_by_slug' post.slug %}>{{ post.title }}</a>
     <hr>

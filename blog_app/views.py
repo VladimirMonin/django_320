@@ -1,8 +1,14 @@
 from django.shortcuts import render, HttpResponse
 from .dataset import dataset
 
+menu = [
+    {"name": "Главная", "alias": "main"},
+    {"name": "Блог", "alias": "blog"},
+    {"name": "О проекте", "alias": "about"},
+]
 
-def index(request) -> HttpResponse:
+
+def blog(request) -> HttpResponse:
     """
     Функция представления для отображения главной страницы блога.
     Параметры:
@@ -13,9 +19,11 @@ def index(request) -> HttpResponse:
     и контекст, содержащим список постов блога.
     """
     context = {
-        'posts': dataset
+        'posts': dataset,
+        'menu': menu,
+        'page_alias': 'blog'
     }
-    return render(request, 'blog_app/index.html', context=context)
+    return render(request, 'blog_app/blog.html', context=context)
 
 def post_by_slug(request, post_slug) -> HttpResponse:
     """
@@ -27,4 +35,22 @@ def post_by_slug(request, post_slug) -> HttpResponse:
         # 404 - Пост не найден
         return HttpResponse('404 - Пост не найден', status=404)
     else:
-        return render(request, 'blog_app/post_detail.html', context=post[0], status=200)
+        context = post[0]
+        context['menu'] = menu
+        context['page_alias'] = 'blog'
+        return render(request, 'blog_app/post_detail.html', context=context, status=200)
+    
+
+def index(request) -> HttpResponse:
+    context = {
+        'menu': menu,
+        'page_alias': 'main'
+    }
+    return render(request, 'index.html', context=context)
+
+def about(request) -> HttpResponse:
+    context = {
+        'menu': menu,
+        'page_alias': 'about'
+    }
+    return render(request, 'about.html', context=context)

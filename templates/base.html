@@ -23,7 +23,9 @@ templates/base.html
   </head>
   <body>
     <header>
-      {% block header %}{% endblock %}
+      {% block header %}
+      {% include 'nav_include.html' %}
+      {% endblock %}
     </header>
 
     <main>

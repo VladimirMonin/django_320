@@ -339,3 +339,41 @@ STATICFILES_DIRS = [
 4. Обратиться к нужному файлу допустим так `<link rel="stylesheet" href="{% static "css/main.css" %}" />`
 
 Коммит: **Подключение статики**
+
+## Lesson 48 знакомство с Django ORM
+
+1. Применим служебные миграции Django. Теперь если зайти в БД мы увидим достаточно много таблиц.
+   
+```bush
+python manage.py migrate
+```
+
+2. Создадим суперпользователя. Это администратор, у которого есть полный набор прав на любые действия в приложении.
+
+Теперь, если заглянуть в БД, можно увидеть в таблице `auth_user` нового пользователя.
+
+```bush
+python manage.py createsuperuser
+```
+
+3. Cоздадим модель `Post`
+
+```python
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    slug = models.SlugField(unique=True)
+    tags = models.JSONField(null=True, blank=True, default=list)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+```
+
+Выполним миграции
+
+```bush
+python manage.py makemigrations
+python manage.py migrate
+```
+
+Коммит: **Создание модели Post**

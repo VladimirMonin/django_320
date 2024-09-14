@@ -482,3 +482,23 @@ get_post_1.delete()
 ```
 
 Коммит: **Посты: Read Update Delete**
+
+
+### Подключение этой модели в админку
+
+У нас есть 2 способа это сделать. Простой, в одну строку, для старта - отличный вариант.
+
+Второй, с описанием класса модели, с помощью декоратора `admin.site.register(Post)`. Который даст возможность кастомизировать внешний вид админки.
+
+```python
+admin.site.register(Post)
+
+# @admin.register(Post)
+# class PostAdmin(admin.ModelAdmin):
+#     list_display = ('title', 'slug', 'created_at', 'updated_at')
+#     search_fields = ('title', 'text')
+#     prepopulated_fields = {'slug': ('title',)}
+
+```
+
+Коммит: **Подключение модели Post в админку**

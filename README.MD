@@ -457,3 +457,28 @@ post3.save()
 ```
 
 Коммит: **Создание постов**
+
+### Read Update Delete
+
+Для поиска постов по `slug` или `id` используем метод `get`
+
+```python
+get_post_1 = Post.objects.get(id = 1)
+get_post_1 = Post.objects.get(pk = 1) # Primary Key
+```
+
+Обновим slug
+
+```python
+get_post_1.slug = "vvedenie_v_yazik_python"
+get_post_1.save()
+```
+
+Удаление постов
+
+```python
+Post.objects.get(id=1).delete()
+get_post_1.delete()
+```
+
+Коммит: **Посты: Read Update Delete**

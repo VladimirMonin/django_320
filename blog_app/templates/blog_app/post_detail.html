@@ -20,14 +20,14 @@ comments: список словарей:
 
 {% block content %}
 <div class="container my-5">
-  <h1>{{ title }}</h1>
-  <p>Текст поста: {{ post }}</p>
+  <h1>{{ post.title }}</h1>
+  <p>Текст поста: {{ post.text }}</p>
   <p>Теги: 
-    {% for hashtag in hashtags %}
+    {% for hashtag in post.tags %}
       <span class="hashtag">{{ hashtag }}</span>
     {% endfor %}
   </p>
-  <p>Просмотры: {{ views }}</p>
-  <p>Лайки: {{ likes }}</p>
+  {% comment %} <p>Просмотры: {{ views }}</p>
+  <p>Лайки: {{ likes }}</p> {% endcomment %}
 </div>
 {% endblock %}

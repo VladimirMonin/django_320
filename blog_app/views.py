@@ -1,5 +1,6 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, get_object_or_404
 from .dataset import dataset
+from .models import Post
 
 menu = [
     {"name": "Главная", "alias": "main"},
@@ -30,15 +31,14 @@ def post_by_slug(request, post_slug) -> HttpResponse:
     Проходим словарей dataset и ищем совпадение по слагу    Если пост не, возвращаем 404.
     В противном случае возвращаем детальную информацию о посте.
     """
-    post = [post for post in dataset if post['slug'] == post_slug]
-    if not post:
-        # 404 - Пост не найден
-        return HttpResponse('404 - Пост не найден', status=404)
-    else:
-        context = post[0]
-        context['menu'] = menu
-        context['page_alias'] = 'blog'
-        return render(request, 'blog_app/post_detail.html', context=context, status=200)
+    post = get_object_or_404(Post, slug=post_slug)
+    context = {
+        "post": post,
+        "menu": menu,
+        "page_alias": "blog"
+    }
+    
+    return render(request, 'blog_app/post_detail.html', context=context, status=200)
     
 
 def index(request) -> HttpResponse:

@@ -6,6 +6,7 @@ menu = [
     {"name": "Главная", "alias": "main"},
     {"name": "Блог", "alias": "blog"},
     {"name": "О проекте", "alias": "about"},
+    {"name": "Добавить пост", "alias": "add_post"}
 ]
 
 
@@ -54,3 +55,47 @@ def about(request) -> HttpResponse:
         'page_alias': 'about'
     }
     return render(request, 'about.html', context=context)
+
+
+def add_post(request):
+    
+    context = {
+        'menu': menu,
+        'page_alias': 'add_post'
+    }
+
+
+    # Если запрос типа GET - вернем страничку с формой добавления поста
+    if request.method == "GET":
+        return render(request, 'blog_app/add_post.html')
+    
+    # Если запрос типа POST - форма была отправлена и мы можем добавить пост
+    elif request.method == "POST":
+        # Получаем данные из формы
+        # Ключи = атрибуты name в <input>
+        title = request.POST['title']
+        text= request.POST['text']
+        slug = request.POST['slug']
+        
+        # Пытаемся опознать пользователя
+        user = request.user
+
+        if title and text and slug:
+            if not Post.objects.filter(slug=slug).exists():
+                # Создаем объект поста и сохраняем его в базу данных
+                post = Post()
+                post.title = title
+                post.text = text
+                post.slug = slug
+                post.author = user
+                post.save()
+
+                context.update({'message': 'Пост успешно добавлен!'})
+                return render(request, 'blog_app/add_post.html', context)
+            else:
+                context.update({'message': 'Такой пост уже существует!'})
+                return render(request, 'blog_app/add_post.html', context)
+            
+        else:
+            context.update({'message': 'Заполните все поля!'})
+            return render(request, 'blog_app/add_post.html', context)

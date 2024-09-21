@@ -67,7 +67,7 @@ def add_post(request):
 
     # Если запрос типа GET - вернем страничку с формой добавления поста
     if request.method == "GET":
-        return render(request, 'blog_app/add_post.html')
+        return render(request, 'blog_app/add_post.html', context=context)
     
     # Если запрос типа POST - форма была отправлена и мы можем добавить пост
     elif request.method == "POST":
@@ -80,22 +80,22 @@ def add_post(request):
         # Пытаемся опознать пользователя
         user = request.user
 
-        if title and text and slug:
-            if not Post.objects.filter(slug=slug).exists():
+        if title and text:
+            # if not Post.objects.filter(slug=slug).exists():
                 # Создаем объект поста и сохраняем его в базу данных
-                post = Post()
-                post.title = title
-                post.text = text
-                post.slug = slug
-                post.author = user
-                post.save()
+            post = Post()
+            post.title = title
+            post.text = text
+            # post.slug = slug
+            post.author = user
+            post.save()
 
-                context.update({'message': 'Пост успешно добавлен!'})
-                return render(request, 'blog_app/add_post.html', context)
-            else:
-                context.update({'message': 'Такой пост уже существует!'})
-                return render(request, 'blog_app/add_post.html', context)
-            
-        else:
-            context.update({'message': 'Заполните все поля!'})
+            context.update({'message': 'Пост успешно добавлен!'})
             return render(request, 'blog_app/add_post.html', context)
+        else:
+            context.update({'message': 'Такой пост уже существует!'})
+            return render(request, 'blog_app/add_post.html', context)
+        
+    else:
+        context.update({'message': 'Заполните все поля!'})
+        return render(request, 'blog_app/add_post.html', context)

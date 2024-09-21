@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 
 
 class Post(models.Model):
@@ -19,6 +20,15 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse("post_by_slug", args=[str(self.slug)])
         # return f"blog/{self.slug}/view/ # Это 2-й вариант работы с адресами в Django
+
+    def save(self, *args, **kwargs):
+        """
+        Переопределение метода save для автоматической генерации slug
+        """
+        if not self.slug:
+            slug = slugify(self.title)
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     
     class Meta:

@@ -319,12 +319,13 @@ path('post/<slug:post_slug>', post_by_slug, name='post_by_slug'),
 Коммит: **Второй цикл шаблона и условия в шаблонах**
 
 ### Цикл внутри цикла
+
 Вложенным циклом вывели список хештегов для поста
 И задали им определенный класс для оформления
 
 Коммит: **Вложенный цикл в шаблонах**
 
-## Подключение статики 
+## Подключение статики
 
 1. Надо оформить 2 константы в `settings.py`
 
@@ -343,7 +344,7 @@ STATICFILES_DIRS = [
 ## Lesson 48 знакомство с Django ORM
 
 1. Применим служебные миграции Django. Теперь если зайти в БД мы увидим достаточно много таблиц.
-   
+
 ```bush
 python manage.py migrate
 ```
@@ -378,7 +379,6 @@ python manage.py migrate
 
 Коммит: **Создание модели Post**
 
-
 ### Django Shell Plus
 
 ```bush
@@ -406,6 +406,7 @@ python manage.py shell_plus --print-sql
 ```
 
 ### Первые запросы
+
 Для выполнения запроса, нам надо обратится к модели по имени, например `User`, после чего обратится к объектному менеджеру `objects` и вызвать нужный метод, например `all()`
 
 `User.objects.all()`
@@ -483,7 +484,6 @@ get_post_1.delete()
 
 Коммит: **Посты: Read Update Delete**
 
-
 ### Подключение этой модели в админку
 
 У нас есть 2 способа это сделать. Простой, в одну строку, для старта - отличный вариант.
@@ -502,3 +502,72 @@ admin.site.register(Post)
 ```
 
 Коммит: **Подключение модели Post в админку**
+
+## Lesson 49. Django ORM. Работа со связью один ко многим
+
+Добавили ссылку на пользователей в модели постов.
+
+```python
+class Post(models.Model):
+    title = models.CharField(max_length=300, unique=True, verbose_name='Заголовок')
+    text = models.TextField(verbose_name='Текст')
+    slug = models.SlugField(unique=True, verbose_name='Адрес страницы')
+    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name='Автор')
+    tags = models.JSONField(null=True, blank=True, default=list, verbose_name='Теги')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
+    views = models.IntegerField(default=0, verbose_name='Просмотры')
+
+    def __str__(self):
+        return str(self.title)
+    
+    def get_absolute_url(self):
+        return reverse("post_by_slug", args=[str(self.slug)])
+        # return f"blog/{self.slug}/view/ # Это 2-й вариант работы с адресами в Django
+
+    
+    class Meta:
+        verbose_name = "Пост"
+        verbose_name_plural = "Посты"
+
+```
+
+### Достать username из поста
+
+```python
+post = Post.objects.get(pk=1)
+author_name = post.author.username
+
+author_name_post_1 = Post.objects.get(pk=1).author.username
+
+# Добываем все посты юзернейм admin
+user_admin_all_posts = User.objects.get(username='admin').posts.all()
+
+# Запуск shell plus
+python manage.py shellplus
+```
+
+## Параметр `related_name` в Django ORM
+
+Параметр `related_name` используется в полях ForeignKey и ManyToManyField для определения имени обратного отношения от связанной модели обратно к этой.
+
+### Пример использования:
+
+```python
+class Post(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+```
+
+**Преимущества**:
+Удобный доступ к связанным объектам:
+
+Без related_name: User.objects.get(id=1).post_set.all()
+С related_name: User.objects.get(id=1).posts.all()
+
+- Избежание конфликтов имен при множественных связях с одной моделью.
+
+Улучшение читаемости кода.
+
+Возможность использования в аннотациях и агрегациях.
+
+related_name значительно упрощает работу с обратными отношениями в Django ORM, делая код более интуитивным и эффективным.

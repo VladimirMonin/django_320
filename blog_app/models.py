@@ -7,7 +7,7 @@ class Post(models.Model):
     title = models.CharField(max_length=300, unique=True, verbose_name='Заголовок')
     text = models.TextField(verbose_name='Текст')
     slug = models.SlugField(unique=True, verbose_name='Адрес страницы')
-    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, verbose_name='Автор')
+    author = models.ForeignKey(get_user_model(), related_name='posts', on_delete=models.CASCADE, verbose_name='Автор')
     tags = models.JSONField(null=True, blank=True, default=list, verbose_name='Теги')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')

@@ -75,8 +75,14 @@ def add_post(request):
         # Ключи = атрибуты name в <input>
         title = request.POST['title']
         text= request.POST['text']
-        slug = request.POST['slug']
-        
+
+        # Проверяем что такого title нет в базе данных
+        # Если есть - выдаём ошибку
+
+        if Post.objects.filter(title=title).exists():
+            context.update({'message': 'Такой заголовок уже существует!'})
+            return render(request, 'blog_app/add_post.html', context=context)
+
         # Пытаемся опознать пользователя
         user = request.user
 
@@ -86,7 +92,6 @@ def add_post(request):
             post = Post()
             post.title = title
             post.text = text
-            # post.slug = slug
             post.author = user
             post.save()
 

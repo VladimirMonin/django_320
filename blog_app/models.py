@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
+from unidecode import unidecode
 
 
 class Post(models.Model):
@@ -26,7 +27,7 @@ class Post(models.Model):
         Переопределение метода save для автоматической генерации slug
         """
         if not self.slug:
-            slug = slugify(self.title)
+            slug = slugify(unidecode(self.title))
             self.slug = slug
         super().save(*args, **kwargs)
 

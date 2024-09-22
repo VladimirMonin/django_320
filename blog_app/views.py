@@ -104,3 +104,15 @@ def add_post(request):
     else:
         context.update({'message': 'Заполните все поля!'})
         return render(request, 'blog_app/add_post.html', context)
+
+
+def posts_by_tag(request, tag):
+    """
+    Функция представления для отображения страницы постов с определенным тегом.
+    """
+    context = {
+        'posts': Post.objects.filter(tags__slug=tag),
+        'menu': menu,
+        'page_alias': 'blog'
+    }
+    return render(request, 'blog_app/blog.html', context=context)

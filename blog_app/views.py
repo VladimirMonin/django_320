@@ -21,7 +21,7 @@ def blog(request) -> HttpResponse:
     и контекст, содержащим список постов блога.
     """
     context = {
-        'posts': dataset,
+        'posts': Post.objects.all(),
         'menu': menu,
         'page_alias': 'blog'
     }

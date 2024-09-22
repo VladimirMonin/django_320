@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load md_to_html %}
 {% comment %} 
 Ключи из словаря поста:
 title
@@ -20,8 +21,9 @@ comments: список словарей:
 
 {% block content %}
 <div class="container my-5">
+  
   <h1>{{ post.title }}</h1>
-  <p>Текст поста: {{ post.text }}</p>
+  {% md_to_html post.text %}
   <p>Теги: 
     {% for hashtag in post.tags %}
       <span class="hashtag">{{ hashtag }}</span>

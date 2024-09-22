@@ -25,7 +25,7 @@ comments: список словарей:
   <h1>{{ post.title }}</h1>
   {% md_to_html post.text %}
   <p>Теги: 
-    {% for hashtag in post.tags %}
+    {% for hashtag in post.tags.all %}
       <span class="hashtag">{{ hashtag }}</span>
     {% endfor %}
   </p>

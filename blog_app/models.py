@@ -10,7 +10,7 @@ class Post(models.Model):
     text = models.TextField(verbose_name='Текст')
     slug = models.SlugField(unique=True, verbose_name='Адрес страницы')
     author = models.ForeignKey(get_user_model(), related_name='posts', on_delete=models.CASCADE, verbose_name='Автор')
-    tags = models.JSONField(null=True, blank=True, default=list, verbose_name='Теги')
+    tags = models.ManyToManyField('Tag', related_name='posts', blank=True, verbose_name='Теги')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     views = models.IntegerField(default=0, verbose_name='Просмотры')
@@ -26,9 +26,8 @@ class Post(models.Model):
         """
         Переопределение метода save для автоматической генерации slug
         """
-        if not self.slug:
-            slug = slugify(unidecode(self.title))
-            self.slug = slug
+        slug = slugify(unidecode(self.title))
+        self.slug = slug
         super().save(*args, **kwargs)
 
     
@@ -37,3 +36,26 @@ class Post(models.Model):
         verbose_name_plural = "Посты"
 
         
+# 3. **Tag**
+#    - Назначение: Модель для тегов постов.
+#    - Поля:
+#      - `name`: `CharField` с `max_length=100`, `unique=True`.
+#      - `slug`: `SlugField` с `unique=True`.
+#    - Методы:
+#      - `save(self, *args, **kwargs)`: Переопределение для автоматической генерации `slug` и приведения имени к нижнему регистру.
+#      - `__str__(self)`: Строковое представление модели.
+#      - `get_absolute_url(self)`: Метод для получения абсолютного URL тега (необязательно, но рекомендуется).
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True)
+
+    def save (self, *args, **kwargs):
+        self.name = self.name.lower().replace(' ', '_')
+        slug = slugify(unidecode(self.name))
+        self.slug = slug
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'#{self.name}'

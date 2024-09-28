@@ -64,6 +64,11 @@ from unidecode import unidecode
 
 
 class Post(models.Model):
+    STATUS_CHOICES = (
+        ("published", "Опубликовано"),
+        ("draft", "Черновик"),
+    )
+    
     title = models.CharField(max_length=300, unique=True, verbose_name="Заголовок")
     text = models.TextField(verbose_name="Текст")
     slug = models.SlugField(unique=True, verbose_name="Адрес страницы")
@@ -88,7 +93,10 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     views = models.IntegerField(default=0, verbose_name="Просмотры")
     cover_image = models.ImageField(blank=True, null=True, verbose_name="Обложка", upload_to="media/images/")
-    # - Статус: Выбор из 'Опубликовано' и 'Черновик'.
+   
+    status = models.CharField(
+            max_length=12, choices=STATUS_CHOICES, default="draft", verbose_name="Статус"
+        )
 
     def __str__(self):
         return str(self.title)

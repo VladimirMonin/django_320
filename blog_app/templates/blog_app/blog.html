@@ -27,7 +27,9 @@ comments: список словарей:
     <h1>Каталог постов</h1>
     
     {% for post in posts %}
+    {% if post.status == 'published' %}
     {% include 'blog_app/post_preview_include.html' %}
+    {% endif %}
     {% endfor %}
     
 </div>

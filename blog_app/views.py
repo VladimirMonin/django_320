@@ -111,6 +111,8 @@ def posts_by_tag(request, tag):
     Функция представления для отображения страницы постов с определенным тегом.
     """
     context = {
+        # Можно получить все посты со стороны тега, используя related_name posts в модели Tag
+        # Tag.objects.get(slug=tag).posts.all()
         'posts': Post.objects.filter(tags__slug=tag),
         'menu': menu,
         'page_alias': 'blog'

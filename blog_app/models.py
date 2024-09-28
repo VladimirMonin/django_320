@@ -87,7 +87,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     views = models.IntegerField(default=0, verbose_name="Просмотры")
-    # Обложка
+    cover_image = models.ImageField(blank=True, null=True, verbose_name="Обложка", upload_to="media/images/")
     # - Статус: Выбор из 'Опубликовано' и 'Черновик'.
 
     def __str__(self):

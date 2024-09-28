@@ -17,7 +17,7 @@ blog_app/templates/blog_app/post_preview_include.html
                 <h5 class="card-title">{{ post.title }}</h5>
                 <p class="card-text">
                     {% if post.category %}
-                    <span class="category">Категория: {{ post.category.name }}</span>
+                    <span class="category"><a href="{{post.category.get_absolute_url}}">{{post.category}}</a></span>
                     {% else %}
                     <span class="category">Без категории</span>
                     {% endif %}

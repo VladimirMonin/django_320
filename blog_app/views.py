@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from .dataset import dataset
-from .models import Post
+from .models import Post, Tag, Category
 
 menu = [
     {"name": "Главная", "alias": "main"},
@@ -118,3 +118,18 @@ def posts_by_tag(request, tag):
         'page_alias': 'blog'
     }
     return render(request, 'blog_app/blog.html', context=context)
+
+
+def posts_by_category(request, category):
+    """
+    Функция представления для отображения страницы постов с определенной категорией.
+    """
+    context = {
+        # Можно получить все посты со стороны тега, используя related_name posts в модели Tag
+        # Tag.objects.get(slug=tag).posts.all()
+        'posts': Category.objects.get(slug=category).posts.all(),
+        'menu': menu,
+        'page_alias': 'blog'
+    }
+    return render(request, 'blog_app/blog.html', context=context)
+        

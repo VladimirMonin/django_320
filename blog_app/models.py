@@ -125,7 +125,9 @@ class Category(models.Model):
     def __str__(self):
         return str(self.name)
 
-    # TODO: get_absolute_url()
+    
+    def get_absolute_url(self):
+        return reverse("posts_by_category", args=[str(self.slug)])
 
     def save(self, *args, **kwargs):
         """

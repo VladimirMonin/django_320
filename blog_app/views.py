@@ -2,6 +2,11 @@ from django.shortcuts import render, HttpResponse, get_object_or_404
 from .dataset import dataset
 from .models import Post, Tag, Category
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .templatetags.md_to_html import markdown_to_html
+
 menu = [
     {"name": "Главная", "alias": "main"},
     {"name": "Блог", "alias": "blog"},
@@ -147,4 +152,12 @@ def posts_by_category(request, category):
         'page_alias': 'blog'
     }
     return render(request, 'blog_app/blog.html', context=context)
-        
+
+
+# @csrf_exempt # Отключает проверку CSRF токена при пост запросах для этой вью
+def preview_post(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        text = data.get('text', '')
+        html = markdown_to_html(text)
+        return JsonResponse({'html': html})

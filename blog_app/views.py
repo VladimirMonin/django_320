@@ -25,8 +25,18 @@ def blog(request) -> HttpResponse:
     sort_by - поле для сортировки (по умолчанию - дата создания, desc, популярность - просмотры)
     search_options - ищем по заголовку, тексту, или по заголовку тексту тегам и категоряим
     """
+    search_query = request.GET.get('search', '')
+
+    if search_query:
+        # 1. Фильтрация по регистронезависимому вхождению. 2. Фильтр по статусу опубликовано. 3. Сортировка по дате создания по убыванию.
+        posts = Post.objects.filter(text__icontains=search_query).filter(status='published').order_by('-created_at')
+    
+    else:
+        # 1. Фильтрация по статусу опубликовано. 2. Сортировка по дате создания по убыванию.
+        posts = Post.objects.filter(status='published').order_by('-created_at')
+    
     context = {
-        'posts': Post.objects.all(),
+        'posts': posts,
         'menu': menu,
         'page_alias': 'blog'
     }
@@ -101,7 +111,10 @@ def add_post(request):
                 post.tags.add(tag)
 
             context.update({'message': 'Пост успешно добавлен!'})
-            return redirect('post_by_slug', post_slug=post.slug)
+            # return redirect('post_by_slug', post_slug=post.slug)
+            # Альтернативный вариант, вернуть пользователя на фомру, показать сообщение об успехе
+            return render(request, 'blog_app/add_post.html', context=context)
+        
         else:
             context.update({'message': 'Заполните все поля!'})
             return render(request, 'blog_app/add_post.html', context=context)

@@ -14,11 +14,15 @@
           <label for="title" class="form-label">Заголовок поста</label>
           <input type="text" class="form-control" name="title" id="title">
         </div>
+        
+        <div class="mb-3">
+          <label for="tags" class="form-label">Теги</label>
+          <input type="text" class="form-control" id="tags" name="tags" placeholder="например: django,python,веб разработка">
+        </div>
         <div class="mb-3">
           <label for="text" class="form-label">Текст поста</label>
-          <input type="text" class="form-control" id="text" name="text">
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="5" id="text" name="text"></textarea>
         </div>
-       
         <button type="submit" class="btn btn-primary">Отправить</button>
       </form>
   </div>

@@ -715,3 +715,10 @@ posts = Post.objects.filter(views__lte=5)
 
 # Посты, с вхождением в имя категории Технолог и количеством просмотров 5+
 posts = Post.objects.filter(category__name__icontains="Технолог").filter(views__gte=5)
+```
+
+### Команда для запуска shell plus
+python manage.py shell_plus
+
+### Команда с выводом SQL запросов в консоль
+python manage.py shell_plus --print-sql

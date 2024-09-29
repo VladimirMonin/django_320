@@ -62,54 +62,51 @@ def about(request) -> HttpResponse:
     return render(request, 'about.html', context=context)
 
 
+from django.shortcuts import render, redirect
+from .models import Post, Tag
+
 def add_post(request):
-    
     context = {
         'menu': menu,
         'page_alias': 'add_post'
     }
 
-
-    # Если запрос типа GET - вернем страничку с формой добавления поста
     if request.method == "GET":
         return render(request, 'blog_app/add_post.html', context=context)
     
-    # Если запрос типа POST - форма была отправлена и мы можем добавить пост
     elif request.method == "POST":
-        # Получаем данные из формы
-        # Ключи = атрибуты name в <input>
         title = request.POST['title']
-        text= request.POST['text']
-
-        # Проверяем что такого title нет в базе данных
-        # Если есть - выдаём ошибку
+        text = request.POST['text']
+        tags = request.POST['tags'] # строка: базы данных, еще тег, sql
 
         if Post.objects.filter(title=title).exists():
             context.update({'message': 'Такой заголовок уже существует!'})
             return render(request, 'blog_app/add_post.html', context=context)
 
-        # Пытаемся опознать пользователя
         user = request.user
 
-        if title and text:
-            # if not Post.objects.filter(slug=slug).exists():
-                # Создаем объект поста и сохраняем его в базу данных
-            post = Post()
-            post.title = title
-            post.text = text
-            post.author = user
-            post.save()
+        if title and text and tags:
+            post = Post.objects.create(
+                title=title,
+                text=text,
+                author=user
+            )
+
+            # Обработка тегов
+            tag_list = [tag.strip().lower().replace(' ', '_') for tag in tags.split(',') if tag.strip()]
+            for tag_name in tag_list:
+                # Если тег есть, добываем, если нет, создаем. В переменной в любом случае будет объект модели Tag
+                tag, created = Tag.objects.get_or_create(name=tag_name)
+                # Создаем связь между этим тегом и постом
+                post.tags.add(tag)
 
             context.update({'message': 'Пост успешно добавлен!'})
-            return render(request, 'blog_app/add_post.html', context)
+            return redirect('post_by_slug', post_slug=post.slug)
         else:
-            context.update({'message': 'Такой пост уже существует!'})
-            return render(request, 'blog_app/add_post.html', context)
-        
-    else:
-        context.update({'message': 'Заполните все поля!'})
-        return render(request, 'blog_app/add_post.html', context)
+            context.update({'message': 'Заполните все поля!'})
+            return render(request, 'blog_app/add_post.html', context=context)
 
+    return render(request, 'blog_app/add_post.html', context=context)
 
 def posts_by_tag(request, tag):
     """

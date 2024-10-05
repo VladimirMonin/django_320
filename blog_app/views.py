@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from .dataset import dataset
 from .models import Post, Tag, Category
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -33,9 +33,10 @@ def blog(request) -> HttpResponse:
     search_query = request.GET.get('search', '')
 
     if search_query:
-        # 1. Фильтрация по регистронезависимому вхождению. 2. Фильтр по статусу опубликовано. 3. Сортировка по дате создания по убыванию.
-        posts = Post.objects.filter(text__icontains=search_query).filter(status='published').order_by('-created_at')
-    
+        posts = Post.objects.filter(
+            (Q(title__icontains=search_query) | Q(text__icontains=search_query)) &
+            Q(status='published')
+            ).order_by('-created_at')
     else:
         # 1. Фильтрация по статусу опубликовано. 2. Сортировка по дате создания по убыванию.
         posts = Post.objects.filter(status='published').order_by('-created_at')

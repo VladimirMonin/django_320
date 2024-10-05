@@ -5,63 +5,6 @@ from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from unidecode import unidecode
 
-"""
-Описание моделей из HW4
-
-
-1. **Post**
-   - Назначение: Модель для хранения информации о постах блога.
-   - Поля:
-     - `title`: `CharField` с `max_length=200`.
-     - `text`: `TextField` для содержания поста.
-     - `slug`: `SlugField` с `unique=True` для уникального идентификатора URL.
-     - `author`: `ForeignKey` к модели пользователя с `on_delete=models.CASCADE`.
-     - `category`: `ForeignKey` к модели `Category` с `on_delete=models.CASCADE`, `related_name='posts'`, `null=True`, `default=None`.
-     - `tags`: `ManyToManyField` к модели `Tag` с `related_name='posts'`.
-     - `published_date`: `DateTimeField` с `auto_now_add=True`.
-     - `updated_date`: `DateTimeField` с `auto_now=True`.
-     - `views`: `IntegerField` с значением по умолчанию 0 (для хранения количества просмотров).
-     - `cover_image`: Поле изображения для обложки (опционально).
-     - Статус: Выбор из 'Опубликовано' и 'Черновик'.
-
-   - Методы:
-     - `save(self, *args, **kwargs)`: Переопределение для автоматической генерации slug.
-     - __str__(self): Строковое представление модели.
-     - get_absolute_url(self): Метод для получения абсолютного URL поста.
-
-
-2. **Category**
-   - Назначение: Модель для категорий постов.
-   - Поля:
-     - `name`: `CharField` с `max_length=200`, `unique=True`.
-     - `slug`: `SlugField` с `unique=True`.
-   - Методы:
-     - `save(self, *args, **kwargs)`: Переопределение для автоматической генерации `slug`.
-     - `__str__(self)`: Строковое представление модели.
-     - `get_absolute_url(self)`: Метод для получения абсолютного URL категории (необязательно, но рекомендуется).
-
-3. **Tag**
-   - Назначение: Модель для тегов постов.
-   - Поля:
-     - `name`: `CharField` с `max_length=100`, `unique=True`.
-     - `slug`: `SlugField` с `unique=True`.
-   - Методы:
-     - `save(self, *args, **kwargs)`: Переопределение для автоматической генерации `slug` и приведения имени к нижнему регистру.
-     - `__str__(self)`: Строковое представление модели.
-     - `get_absolute_url(self)`: Метод для получения абсолютного URL тега (необязательно, но рекомендуется).
-
-4. **Comment**
-   - Назначение: Модель для комментариев к постам.
-   - Поля:
-     - `author`: `ForeignKey` к модели пользователя с `on_delete=models.CASCADE`.
-     - `text`: `TextField` для содержания комментария.
-     - `status`: `CharField` с `max_length=10`, `choices=STATUS_CHOICES`, `default='unchecked'`.
-     - `post`: `ForeignKey` к модели `Post` с `on_delete=models.CASCADE`.
-   - Методы:
-     - `__str__(self)`: Строковое представление модели.
-
-"""
-
 
 class Post(models.Model):
     STATUS_CHOICES = (

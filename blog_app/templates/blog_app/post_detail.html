@@ -1,35 +1,64 @@
 {% extends 'base.html' %}
 {% load md_to_html %}
-{% comment %} 
-Ключи из словаря поста:
-title
-slug
-post
-hashtags: список
-is_published: bool
-views: int
-likes: int
-comments: список словарей:
-    username
-    text
-
+{% comment %}
+Категория
+Обложка если есть
+Просмотры
+Автор
+Дата публикации
 {% endcomment %}
 
-
-
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-  
-  <h1>{{ post.title }}</h1>
-  {% md_to_html post.text %}
-  <p>Теги: 
-    {% for hashtag in post.tags.all %}
-      <span class="hashtag"> <a href="{{hashtag.get_absolute_url}}">{{ hashtag.name }}</a></span>
-    {% endfor %}
-  </p>
-  {% comment %} <p>Просмотры: {{ views }}</p>
-  <p>Лайки: {{ likes }}</p> {% endcomment %}
+
+  {% comment %} Отображение обложки, если она есть {% endcomment %}
+  {% if post.cover_image %}
+    <div class="text-center mb-4">
+      <img src="{{ post.cover_image.url }}" class="img-fluid" alt="Обложка поста">
+    </div>
+  {% endif %}
+
+  {% comment %} Текст поста {% endcomment %}
+  <div class="post-content mb-4">
+    {% md_to_html post.text %}
+  </div>
+
+  {% comment %} Контейнер с дополнительной информацией {% endcomment %}
+  <div class="d-flex flex-wrap justify-content-between align-items-center bg-light p-3 mb-4 rounded">
+    
+    <div class="me-3">
+      <i class="bi bi-person-circle"></i> {{ post.author.username }}
+    </div>
+
+    <div class="me-3">
+      <i class="bi bi-eye"></i> {{ post.views }} просмотров
+    </div>
+
+    {% if post.category %}
+      <div class="me-3">
+        <i class="bi bi-grid"></i> Категория: <a href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a>
+      </div>
+    {% endif %}
+
+    <div>
+      <i class="bi bi-calendar"></i> {{ post.created_at|date:"d M Y" }}
+    </div>
+    
+  </div>
+
+  {% comment %} Контейнер для тегов {% endcomment %}
+  <div class="mb-4">
+    <h5>Теги:</h5>
+    <div class="d-flex flex-wrap">
+      {% for hashtag in post.tags.all %}
+        <span class="badge bg-secondary me-2 mb-2">
+          <a href="{{ hashtag.get_absolute_url }}" class="text-white text-decoration-none">#{{ hashtag.name }}</a>
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+
 </div>
 {% endblock %}

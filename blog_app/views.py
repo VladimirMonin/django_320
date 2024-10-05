@@ -53,6 +53,9 @@ def post_by_slug(request, post_slug) -> HttpResponse:
     В противном случае возвращаем детальную информацию о посте.
     """
     post = get_object_or_404(Post, slug=post_slug)
+    if post:
+        post.views += 1
+        post.save()
     context = {
         "post": post,
         "menu": menu,
@@ -156,6 +159,9 @@ def posts_by_category(request, category):
 
 # @csrf_exempt # Отключает проверку CSRF токена при пост запросах для этой вью
 def preview_post(request):
+    """
+    Вью которая работает на AJAX запросы, и дает предпросмотр постов при создании нового поста.
+    """
     if request.method == 'POST':
         data = json.loads(request.body)
         text = data.get('text', '')

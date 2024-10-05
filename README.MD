@@ -722,3 +722,6 @@ python manage.py shell_plus
 
 ### Команда с выводом SQL запросов в консоль
 python manage.py shell_plus --print-sql
+
+## Lesson 53 F и Q объекты
+

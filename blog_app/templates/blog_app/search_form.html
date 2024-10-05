@@ -1,8 +1,28 @@
 <form action="{% url 'blog' %}" method="get" class="mb-4">
-    <div class="input-group">
+    <div class="input-group mb-3">
         <input type="text" name="search" class="form-control" placeholder="Поиск по постам..." value="{{ request.GET.search }}">
         <button class="btn btn-primary" type="submit">
             <i class="bi bi-search"></i>
         </button>
+    </div>
+    <div class="d-flex flex-column">
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="search_category" id="searchCategory">
+            <label class="form-check-label" for="searchCategory">
+                Поиск по категории
+            </label>
+        </div>
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="search_tag" id="searchTag">
+            <label class="form-check-label" for="searchTag">
+                Поиск по тегу
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="search_comments" id="searchComments">
+            <label class="form-check-label" for="searchComments">
+                Поиск по комментариям
+            </label>
+        </div>
     </div>
 </form>

@@ -14,37 +14,30 @@ menu = [
     {"name": "Добавить пост", "alias": "add_post"},
 ]
 
-
-def blog(request) -> HttpResponse:
-    """
-     Функция представления для отображения главной страницы блога.
-     Параметры:
-     request: объект запроса Django, который содержит информацию оем запросе.
-
-    вращает:
-     HttpResponse: HTTP-ответ с отрендеренной страницей 'index.html'
-     и контекст, содержащим список постов блога.
-    """
-    """
-    query - ключ для поискового запроса
-    sort_by - поле для сортировки (по умолчанию - дата создания, desc, популярность - просмотры)
-    search_options - ищем по заголовку, тексту, или по заголовку тексту тегам и категоряим
-    """
-    # Чекбоксы!
-    # search_category
-    # search_tag
-    # search_comments
-
+def blog(request):
     search_query = request.GET.get("search", "")
+    search_category = request.GET.get("search_category")
+    search_tag = request.GET.get("search_tag")
+    search_comments = request.GET.get("search_comments")
+
+    
+    posts = Post.objects.filter(status="published")
 
     if search_query:
-        posts = Post.objects.filter(
-            (Q(title__icontains=search_query) | Q(text__icontains=search_query))
-            & Q(status="published")
-        ).order_by("-created_at")
-    else:
-        # 1. Фильтрация по статусу опубликовано. 2. Сортировка по дате создания по убыванию.
-        posts = Post.objects.filter(status="published").order_by("-created_at")
+        query = Q(title__icontains=search_query) | Q(text__icontains=search_query) 
+        
+        if search_category:
+            query |= Q(category__name__icontains=search_query)
+        
+        if search_tag:
+            query |= Q(tags__name__icontains=search_query)
+        
+        if search_comments:
+            query |= Q(comment__text__icontains=search_query)
+        
+        posts = posts.filter(query)
+
+    posts = posts.distinct().order_by("-created_at")
 
     context = {"posts": posts, "menu": menu, "page_alias": "blog"}
     return render(request, "blog_app/blog.html", context=context)

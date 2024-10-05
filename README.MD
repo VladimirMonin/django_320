@@ -872,3 +872,69 @@ posts_with_comments = Post.objects.filter(comment__isnull=False).distinct()
 keyword = "Python"
 posts_with_keyword = Post.objects.filter(Q(title__icontains=keyword) | Q(text__icontains=keyword))
 ```
+
+#### Финальный вид вьюшки для поисковой формы
+
+### Основы Q-объектов
+
+Q-объекты в Django позволяют формировать сложные запросы с использованием логических операторов, что особенно актуально при комбинировании нескольких условий фильтрации.
+
+### Оператор |=
+
+В контексте Q-объектов оператор `|=` обозначает "ИЛИ равно". Он добавляет новое условие к уже существующему Q-объекту, объединяя их с помощью логического ИЛИ.
+
+**Пример:**
+
+```python
+query |= Q(category__name__icontains=search_query)
+```
+
+Это эквивалентно следующему:
+
+```python
+query = query | Q(category__name__icontains=search_query)
+```
+
+### Другие операторы
+
+- `&` (И): `query &= Q(condition)`
+- `~` (НЕ): `~Q(condition)`
+
+### Группировка условий
+
+Условия можно группировать с помощью скобок:
+
+```python
+Q(condition1) & (Q(condition2) | Q(condition3))
+```
+
+### Как работает код
+
+1. Сначала создается базовый запрос для поиска по заголовку и тексту.
+2. Затем, в зависимости от выбранных чекбоксов, добавляются дополнительные условия с использованием `|=`.
+3. Каждое добавленное условие расширяет область поиска.
+4. В конце применяется метод `distinct()`, чтобы убрать дубликаты, которые могут появиться из-за JOIN-запросов.
+
+### Альтернативные подходы
+
+Можно создать список условий и объединять их в конце:
+
+```python
+conditions = [Q(title__icontains=search_query), Q(text__icontains=search_query)]
+if search_category:
+    conditions.append(Q(category__name__icontains=search_query))
+# ... добавляем другие условия
+query = reduce(operator.or_, conditions)
+```
+
+Для более сложных запросов можно использовать Q-объекты внутри метода `filter()`:
+
+```python
+Post.objects.filter(
+    Q(title__icontains=search_query) |
+    Q(text__icontains=search_query) |
+    Q(category__name__icontains=search_query)
+)
+```
+
+Этот подход позволяет создавать гибкие и мощные запросы, адаптируясь к различным комбинациям условий поиска.

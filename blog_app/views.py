@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
 from .dataset import dataset
 from .models import Post, Tag, Category
-
+from django.db.models import F
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -47,21 +47,23 @@ def blog(request) -> HttpResponse:
     }
     return render(request, 'blog_app/blog.html', context=context)
 
+
 def post_by_slug(request, post_slug) -> HttpResponse:
     """
-    Проходим словарей dataset и ищем совпадение по слагу    Если пост не, возвращаем 404.
-    В противном случае возвращаем детальную информацию о посте.
+    Проходим словарем и ищем запись по слагу.
+    Если пост не найден, возвращаем 404, иначе выводим детальную информацию и увеличиваем количество просмотров.
     """
     post = get_object_or_404(Post, slug=post_slug)
-    if post:
-        post.views += 1
-        post.save()
+
+    # 1. Увеличиваем значение просмотров поста на 1, используя F-объект
+    Post.objects.filter(slug=post_slug).update(views=F('views') + 1)
+
     context = {
         "post": post,
         "menu": menu,
         "page_alias": "blog"
     }
-    
+
     return render(request, 'blog_app/post_detail.html', context=context, status=200)
     
 

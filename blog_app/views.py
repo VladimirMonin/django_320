@@ -21,7 +21,7 @@ def blog(request):
     search_comments = request.GET.get("search_comments")
 
     
-    posts = Post.objects.filter(status="published")
+    posts = Post.objects.prefetch_related('tags').select_related('author').select_related('category').filter(status="published")
 
     if search_query:
         query = Q(title__icontains=search_query) | Q(text__icontains=search_query) 

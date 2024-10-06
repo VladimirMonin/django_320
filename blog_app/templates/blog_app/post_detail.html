@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% load md_to_html %}
 {% load static %}
+{% load cache %}
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-  
+  {% cache 60 post_detail post.id %}
   <!-- Кнопка "Назад" -->
   <div class="mb-4">
     <a href="{% url 'blog' %}" class="btn btn-secondary">
@@ -76,6 +77,6 @@
       {% endfor %}
     </div>
   </div>
-
+  {% endcache %}
 </div>
 {% endblock %}

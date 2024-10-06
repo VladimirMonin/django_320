@@ -4,7 +4,7 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from unidecode import unidecode
-
+from django.core.cache import cache
 
 class Post(models.Model):
     STATUS_CHOICES = (
@@ -52,9 +52,18 @@ class Post(models.Model):
         """
         Переопределение метода save для автоматической генерации slug
         """
+        # Автоматическая генерация slug
         slug = slugify(unidecode(self.title))
         self.slug = slug
+        
         super().save(*args, **kwargs)
+        # Работа с кешированием
+        # Сброс кеша превью поста
+        cache.delete(f'post_preview {self.id}')
+        # Сброс кеша детального просмотра поста
+        cache.delete(f'post_detail {self.id}')
+        # Сброс кеша списка постов (можно сбросить весь кеш каталога или определенные страницы)
+        cache.delete('blog_post_list')
 
     class Meta:
         verbose_name = "Пост"

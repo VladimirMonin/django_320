@@ -77,6 +77,33 @@
       {% endfor %}
     </div>
   </div>
+
+  <!-- Комментарии -->
+  <div class="mb-4">
+    <h3>Комментарии</h3>
+    {% if comments %}
+      {% for comment in comments %}
+        {% include 'blog_app/comment.html' %}
+      {% endfor %}
+    {% else %}
+      <p>Пока нет комментариев. Будьте первым!</p>
+    {% endif %}
+  </div>
+
+  <!-- Форма добавления комментария -->
+  <div class="mb-4">
+    <h3>Оставить комментарий</h3>
+    {% if user.is_authenticated %}
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Отправить</button>
+      </form>
+    {% else %}
+      <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a>, чтобы оставить комментарий.</p>
+    {% endif %}
+  </div>
+
   {% endcache %}
 </div>
 {% endblock %}

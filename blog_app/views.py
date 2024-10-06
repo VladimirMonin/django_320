@@ -6,7 +6,10 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .templatetags.md_to_html import markdown_to_html
-
+from .forms import CommentForm
+from django.shortcuts import render, redirect
+from .models import Post, Tag
+from django.contrib import messages
 menu = [
     {"name": "Главная", "alias": "main"},
     {"name": "Блог", "alias": "blog"},
@@ -43,20 +46,37 @@ def blog(request):
     return render(request, "blog_app/blog.html", context=context)
 
 
-def post_by_slug(request, post_slug) -> HttpResponse:
-    """
-    Проходим словарем и ищем запись по слагу.
-    Если пост не найден, возвращаем 404, иначе выводим детальную информацию и увеличиваем количество просмотров.
-    """
+def post_by_slug(request, post_slug):
     post = get_object_or_404(Post, slug=post_slug)
 
-    # 1. Увеличиваем значение просмотров поста на 1, используя F-объект
-    Post.objects.filter(slug=post_slug).update(views=F("views") + 1)
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                # Создаем комментарий, но пока не сохраняем в базу
+                comment = form.save(commit=False)
+                comment.post = post
+                comment.author = request.user
+                comment.status = 'unchecked'  # Устанавливаем статус "Не проверен"
+                comment.save()
+                messages.success(request, 'Ваш комментарий находится на модерации.')
+                return redirect('post_by_slug', post_slug=post_slug)
+        else:
+            messages.error(request, 'Для добавления комментария необходимо войти в систему.')
+            return redirect('login')
+    else:
+        form = CommentForm()
 
-    context = {"post": post, "menu": menu, "page_alias": "blog"}
+    # Выбираем только одобренные комментарии
+    comments = post.comment_set.filter(status='accepted')
 
-    return render(request, "blog_app/post_detail.html", context=context, status=200)
+    context = {
+        'post': post,
+        'form': form,
+        'comments': comments,
+    }
 
+    return render(request, 'blog_app/post_detail.html', context)
 
 def index(request) -> HttpResponse:
     context = {"menu": menu, "page_alias": "main"}
@@ -68,8 +88,7 @@ def about(request) -> HttpResponse:
     return render(request, "about.html", context=context)
 
 
-from django.shortcuts import render, redirect
-from .models import Post, Tag
+
 
 
 def add_post(request):

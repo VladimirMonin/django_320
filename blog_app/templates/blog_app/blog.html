@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load cache %}
 
 {% block title %}Каталог постов{% endblock %}
 
@@ -12,7 +13,12 @@
     <h1 class="mb-4">Каталог постов</h1>
     
     {% include 'blog_app/search_form.html' %}
-    
+    {% comment %} 
+    300 - время кеширования в секундах
+    blog_post_list - название кеша
+    page_obj.number - номер текущей страницы (Позволяет правильно кешировать постранично)
+    {% endcomment %}
+    {% cache 60 blog_post_list page_obj.number %}
     <div class="row">
         {% for post in posts %}
             {% if post.status == 'published' %}
@@ -26,5 +32,6 @@
             </div>
         {% endfor %}
     </div>
+    {% endcache %}
 </div>
 {% endblock %}

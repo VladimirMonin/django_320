@@ -91,10 +91,11 @@ TODO сделать JS листание страниц или обдумать �
       {% for comment in page_obj %}
         {% include 'blog_app/comment.html' %}
       {% endfor %}
-
+      {% with page_obj=comments %}
       {% if page_obj.has_other_pages %}
       {% include 'blog_app/pagination_include.html' with page_obj=page_obj %}
       {% endif %}
+      {% endwith %}
     {% else %}
       <p>Пока нет комментариев. Будьте первым!</p>
     {% endif %}

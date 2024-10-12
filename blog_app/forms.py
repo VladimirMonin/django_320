@@ -9,5 +9,5 @@ class CommentForm(forms.ModelForm):
             'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Введите ваш комментарий...'}),
         }
         labels = {
-            'text': '',
+            'text': 'Текст комментария',
         }

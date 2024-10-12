@@ -53,7 +53,7 @@ def blog(request):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)  # Если страница вне диапазона, показываем последнюю
 
-    context = {"page_obj": posts, "menu": menu, "page_alias": "blog"}
+    context = {"posts": posts, "menu": menu, "page_alias": "blog"}
     return render(request, "blog_app/blog.html", context=context)
 
 
@@ -93,7 +93,7 @@ def post_by_slug(request, post_slug):
     context = {
         'post': post,
         'form': form,
-        'page_obj': comments_page,
+        'comments': comments_page,
     }
 
     return render(request, 'blog_app/post_detail.html', context)

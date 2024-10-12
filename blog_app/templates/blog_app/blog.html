@@ -18,9 +18,9 @@
     blog_post_list - название кеша
     page_obj.number - номер текущей страницы (Позволяет правильно кешировать постранично)
     {% endcomment %}
-    {% cache 60 blog_post_list page_obj.number %}
+    {% cache 60 blog_post_list posts.number %}
     <div class="row">
-        {% for post in page_obj %}
+        {% for post in posts %}
             {% if post.status == 'published' %}
                 <div class="col-md-6 mb-4">
                     {% include 'blog_app/post_preview_include.html' %}
@@ -34,10 +34,11 @@
     </div>
     {% comment %} Пагинатор {% endcomment %}
     {% comment %} Проверяем, что есть другие страницы {% endcomment %}
+    {% with page_obj=posts %}
     {% if page_obj.has_other_pages %}
 {% include 'blog_app/pagination_include.html' %}
 {% endif %}
-
+{% endwith %}
     {% endcache %}
 </div>
 {% endblock %}

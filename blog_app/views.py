@@ -10,6 +10,8 @@ from .forms import CommentForm
 from django.shortcuts import render, redirect
 from .models import Post, Tag
 from django.contrib import messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 menu = [
     {"name": "Главная", "alias": "main"},
     {"name": "Блог", "alias": "blog"},
@@ -22,7 +24,7 @@ def blog(request):
     search_category = request.GET.get("search_category")
     search_tag = request.GET.get("search_tag")
     search_comments = request.GET.get("search_comments")
-
+    page_number = request.GET.get('page', 1)  # Получаем номер страницы из URL-параметра 'page' /blog/?page=2
     
     posts = Post.objects.prefetch_related('tags').select_related('author').select_related('category').filter(status="published")
 
@@ -41,6 +43,15 @@ def blog(request):
         posts = posts.filter(query)
 
     posts = posts.distinct().order_by("-created_at")
+
+    paginator = Paginator(posts, 2) # первый аргумент - кверисет, второй - сколько объектов на странице
+
+    try:
+        posts = paginator.page(page_number)
+    except PageNotAnInteger:
+        posts = paginator.page(1)  # Если параметр page не число, показываем первую страницу
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)  # Если страница вне диапазона, показываем последнюю
 
     context = {"posts": posts, "menu": menu, "page_alias": "blog"}
     return render(request, "blog_app/blog.html", context=context)

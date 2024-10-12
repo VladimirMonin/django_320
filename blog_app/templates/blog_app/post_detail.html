@@ -3,12 +3,16 @@
 {% load static %}
 {% comment %} {% load cache %} {% endcomment %}
 {% comment %} 
-TODO доделать кеширование комментариев {% endcomment %}
+TODO доделать кеширование комментариев 
+TODO сделать JS листание страниц или обдумать концепцию
+
+{% endcomment %}
+
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-  {% cache 60 post_detail post.id %}
+  {% comment %} {% cache 60 post_detail post.id %} {% endcomment %}
   <!-- Кнопка "Назад" -->
   <div class="mb-4">
     <a href="{% url 'blog' %}" class="btn btn-secondary">

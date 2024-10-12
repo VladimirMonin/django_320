@@ -53,7 +53,7 @@ def blog(request):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)  # Если страница вне диапазона, показываем последнюю
 
-    context = {"posts": posts, "menu": menu, "page_alias": "blog"}
+    context = {"page_obj": posts, "menu": menu, "page_alias": "blog"}
     return render(request, "blog_app/blog.html", context=context)
 
 
@@ -78,13 +78,22 @@ def post_by_slug(request, post_slug):
     else:
         form = CommentForm()
 
-    # Выбираем только одобренные комментарии
-    comments = post.comment_set.filter(status='accepted')
+     # Пагинация комментариев
+    comments_list = post.comments.filter(status='accepted').order_by('-created_at')
+    paginator = Paginator(comments_list, 2)  # 5 комментариев на страницу
+    page_number = request.GET.get('page')
+
+    try:
+        comments_page = paginator.page(page_number)
+    except PageNotAnInteger:
+        comments_page = paginator.page(1)
+    except EmptyPage:
+        comments_page = paginator.page(paginator.num_pages)
 
     context = {
         'post': post,
         'form': form,
-        'comments': comments,
+        'page_obj': comments_page,
     }
 
     return render(request, 'blog_app/post_detail.html', context)

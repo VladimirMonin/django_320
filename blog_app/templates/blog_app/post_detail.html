@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load md_to_html %}
 {% load static %}
-{% load cache %}
+{% comment %} {% load cache %} {% endcomment %}
+{% comment %} 
+TODO доделать кеширование комментариев {% endcomment %}
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
@@ -81,10 +83,14 @@
   <!-- Комментарии -->
   <div class="mb-4">
     <h3>Комментарии</h3>
-    {% if comments %}
-      {% for comment in comments %}
+    {% if page_obj %}
+      {% for comment in page_obj %}
         {% include 'blog_app/comment.html' %}
       {% endfor %}
+
+      {% if page_obj.has_other_pages %}
+      {% include 'blog_app/pagination_include.html' with page_obj=page_obj %}
+      {% endif %}
     {% else %}
       <p>Пока нет комментариев. Будьте первым!</p>
     {% endif %}
@@ -97,13 +103,13 @@
       <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Отправить</button>
+        <button type="submit" class="btn btn-dark">Отправить</button>
       </form>
     {% else %}
       <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a>, чтобы оставить комментарий.</p>
     {% endif %}
   </div>
 
-  {% endcache %}
+  {% comment %} {% endcache %} {% endcomment %}
 </div>
 {% endblock %}

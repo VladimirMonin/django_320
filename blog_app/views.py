@@ -240,6 +240,7 @@ def add_tag(request):
             # Так как форма связана с моделью мы можем использовать метод save() к форме
             form.save()
             # Добавляем ключ message о том что тег добавлен
+            name = form.cleaned_data['name']
             context["message"] = f"Тег {name} успешно добавлен!"
             return render(request, "blog_app/add_tag.html", context)
         context["form"] = form

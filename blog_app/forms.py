@@ -12,28 +12,39 @@ class CommentForm(forms.ModelForm):
             'text': 'Текст комментария',
         }
 
-# форма не связанная с моделью
 class CategoryForm(forms.Form):
-    name = forms.CharField(max_length=200, min_length=3, 
-                           label='Название категории', required=True,
-                           widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название категории'}),
-                           help_text='Введите название категории (от 3 до 200 символов)')
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название категории'}),
+    )
     
+    class Meta:
+        fields = ['name']
+        labels = {
+            'name': 'Название категории',
+        }
+        help_texts = {
+            'name': 'Введите название категории (от 3 до 200 символов)',
+        }
+        min_length = {
+            'name': 3,
+        }
+        max_length = {
+            'name': 200,
+        }
+
     def clean_name(self):
         name = self.cleaned_data['name']
         if Category.objects.filter(name=name).exists():
             raise forms.ValidationError("Категория с таким названием уже существует.")
         return name
-    
 
 class TagForm(forms.ModelForm):
+    name = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название тега'}),
+        label='Название тега'
+    )
     
     class Meta:
         model = Tag
         fields = ['name']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название тега'}),
-        }
-        labels = {
-            'name': 'Название тега',
-        }

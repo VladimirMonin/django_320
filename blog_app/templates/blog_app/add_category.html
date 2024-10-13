@@ -9,18 +9,18 @@
     <h1>Добавить новую категорию</h1>
 <form method="post">
     {% csrf_token %}
-    {% for field in form %}
-        
-            {{ field.label_tag }}
-            {{ field }}
-            {{ field.help_text }}
+    {{ form.name.label_tag }}
+    {{ form.name }}
+    {% if form.name.help_text %}
+    <p><small class="form-text text-muted">{{ form.name.help_text }}</small></p>
+    {% endif %}
             {% if field.errors %}
                 <div class="alert alert-danger m-1">
                     {{ field.errors }}
                 </div>
             {% endif %}
       
-    {% endfor %}
+    
             {% comment %} Сообщение об успешной отправки. Если есть, кнопку отправить убираем {% endcomment %}
             {% if message %}
             <p class="alert alert-success">{{ message }}</p>

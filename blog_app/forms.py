@@ -16,4 +16,5 @@ class CommentForm(forms.ModelForm):
 class CategoryForm(forms.Form):
     name = forms.CharField(max_length=200, min_length=3, 
                            label='Название категории', required=True,
-                           widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название категории'}))
+                           widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название категории'}),
+                           help_text='Введите название категории (от 3 до 200 символов)')

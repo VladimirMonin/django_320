@@ -210,6 +210,8 @@ def add_category(request):
         if form.is_valid():
             name = form.cleaned_data['name']
             Category.objects.create(name=name)
-            return redirect('blog')  # Перенаправление на страницу блога после добавления
+            # Добавляем ключ message о том что категория добавлена
+            context["message"] = f"Категория {name} успешно добавлена!"
+            return render(request, "blog_app/add_category.html", context)
         context["form"] = form
         return render(request, "blog_app/add_category.html", context)

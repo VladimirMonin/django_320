@@ -7,9 +7,6 @@
   <div class="row">
     <div class="col-6">
       <h1>Добавить пост</h1>
-      {% if message %}
-      <p class="alert alert-success">{{ message }}</p>
-      {% endif %}
       <form method="POST">
         {% csrf_token %}
         <div class="mb-3">
@@ -25,7 +22,12 @@
           <label for="text" class="form-label">Текст поста</label>
           <textarea class="form-control" id="text" name="text" rows="5"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Отправить</button>
+        {% comment %} Сообщение об успешной отправки. Если есть, кнопку отправить убираем {% endcomment %}
+        {% if message %}
+        <p class="alert alert-success">{{ message }}</p>
+        {% else %}
+        <button type="submit" class="btn btn-dark">Отправить</button>
+        {% endif %}
       </form>
     </div>
     <div class="col-6">

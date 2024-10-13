@@ -6,11 +6,27 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Добавить новую категорию</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-dark">Добавить</button>
-    </form>
+    <h1>Добавить новую категорию</h1>
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        
+            {{ field.label_tag }}
+            {{ field }}
+            {{ field.help_text }}
+            {% if field.errors %}
+                <div class="alert alert-danger m-1">
+                    {{ field.errors }}
+                </div>
+            {% endif %}
+      
+    {% endfor %}
+            {% comment %} Сообщение об успешной отправки. Если есть, кнопку отправить убираем {% endcomment %}
+            {% if message %}
+            <p class="alert alert-success">{{ message }}</p>
+            {% else %}
+            <button type="submit" class="btn btn-dark mt-3">Отправить</button>
+            {% endif %}
+</form>
 </div>
 {% endblock %}

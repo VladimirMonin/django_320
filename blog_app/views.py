@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .templatetags.md_to_html import markdown_to_html
-from .forms import CommentForm, CategoryForm
+from .forms import CommentForm, CategoryForm, TagForm
 from django.shortcuts import render, redirect
 from .models import Post, Tag
 from django.contrib import messages
@@ -208,6 +208,11 @@ def add_category(request):
     elif request.method == "POST":
         form = CategoryForm(request.POST)
         if form.is_valid():
+            # Добавим проверку, существует ли категория с таким именем
+            # if Category.objects.filter(name=form.cleaned_data['name']).exists():
+                # Помещаем ошибку в form
+                # pass
+            # Если нет
             name = form.cleaned_data['name']
             Category.objects.create(name=name)
             # Добавляем ключ message о том что категория добавлена
@@ -215,3 +220,28 @@ def add_category(request):
             return render(request, "blog_app/add_category.html", context)
         context["form"] = form
         return render(request, "blog_app/add_category.html", context)
+    
+
+def add_tag(request):
+    """
+    Будет использовать форму связанную с моделью Tag - TagForm
+    Шаблон - add_tag.html
+    """
+    context = {"menu": menu}
+
+    if request.method == "GET":
+        form = TagForm()
+        context["form"] = form
+        return render(request, "blog_app/add_tag.html", context)
+    
+    elif request.method == "POST":
+        form = TagForm(request.POST)
+        if form.is_valid():
+            # Так как форма связана с моделью мы можем использовать метод save() к форме
+            form.save()
+            # Добавляем ключ message о том что тег добавлен
+            context["message"] = f"Тег {name} успешно добавлен!"
+            return render(request, "blog_app/add_tag.html", context)
+        context["form"] = form
+        return render(request, "blog_app/add_tag.html", context)
+    

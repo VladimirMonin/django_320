@@ -1,5 +1,5 @@
 from django import forms
-from .models import Comment
+from .models import Comment, Category, Tag
 
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -18,3 +18,22 @@ class CategoryForm(forms.Form):
                            label='Название категории', required=True,
                            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название категории'}),
                            help_text='Введите название категории (от 3 до 200 символов)')
+    
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if Category.objects.filter(name=name).exists():
+            raise forms.ValidationError("Категория с таким названием уже существует.")
+        return name
+    
+
+class TagForm(forms.ModelForm):
+    
+    class Meta:
+        model = Tag
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название тега'}),
+        }
+        labels = {
+            'name': 'Название тега',
+        }

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}
-Добавить категорию
+Добавить тег
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Добавить новую категорию</h1>
+    <h1>Добавить новый тег</h1>
 <form method="post">
     {% csrf_token %}
     {{ form.name.label_tag }}

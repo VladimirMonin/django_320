@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .templatetags.md_to_html import markdown_to_html
-from .forms import CommentForm
+from .forms import CommentForm, CategoryForm
 from django.shortcuts import render, redirect
 from .models import Post, Tag
 from django.contrib import messages
@@ -193,3 +193,23 @@ def preview_post(request):
         text = data.get("text", "")
         html = markdown_to_html(text)
         return JsonResponse({"html": html})
+
+
+
+
+def add_category(request):
+    context = {"menu": menu}
+
+    if request.method == "GET":
+        form = CategoryForm()
+        context["form"] = form
+        return render(request, "blog_app/add_category.html", context)
+    
+    elif request.method == "POST":
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            Category.objects.create(name=name)
+            return redirect('blog')  # Перенаправление на страницу блога после добавления
+        context["form"] = form
+        return render(request, "blog_app/add_category.html", context)

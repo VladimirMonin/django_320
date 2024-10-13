@@ -48,3 +48,16 @@ class TagForm(forms.ModelForm):
     class Meta:
         model = Tag
         fields = ['name']
+
+    def save(self, commit=True):
+        """
+        Тут можно переопределить логику сохранения. 
+        Как правило это добавление связанных данных или т.п.
+        """
+        return tag
+    
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if Tag.objects.filter(name=name).exists():
+            raise forms.ValidationError("Тег с таким названием уже существует.")
+        return name

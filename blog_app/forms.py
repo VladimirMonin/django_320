@@ -57,6 +57,8 @@ class TagForm(forms.ModelForm):
         return tag
     
     def clean_name(self):
+
+        # TODO проверить HTML html - одно вызовет ошибку формы, другое упадет уже из базы
         name = self.cleaned_data['name']
         if Tag.objects.filter(name=name).exists():
             raise forms.ValidationError("Тег с таким названием уже существует.")

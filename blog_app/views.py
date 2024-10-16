@@ -59,6 +59,9 @@ def blog(request):
 
 def post_by_slug(request, post_slug):
     post = get_object_or_404(Post, slug=post_slug)
+    # Простой вариант увеличения просмотров
+    post.views = F('views') + 1
+    post.save(update_fields=['views'])
 
     if request.method == 'POST':
         if request.user.is_authenticated:

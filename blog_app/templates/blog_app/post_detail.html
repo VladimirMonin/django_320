@@ -80,19 +80,17 @@
   <!-- Комментарии -->
   <div class="mb-4">
     <h3>Комментарии</h3>
-    {% if page_obj %}
-      {% for comment in page_obj %}
-        {% include 'blog_app/comment.html' %}
-      {% endfor %}
-      {% with page_obj=comments %}
-      {% if page_obj.has_other_pages %}
-      {% include 'blog_app/pagination_include.html' with page_obj=page_obj %}
-      {% endif %}
-      {% endwith %}
-    {% else %}
-      <p>Пока нет комментариев. Будьте первым!</p>
-    {% endif %}
-  </div>
+  {% if comments %}
+  {% for comment in comments %}
+      {% include 'blog_app/comment.html' %}
+  {% endfor %}
+    
+  {% if comments.has_other_pages %}
+      {% include 'blog_app/pagination_include.html' with page_obj=comments %}
+  {% endif %}
+{% else %}
+  <p>Пока нет комментариев. Будьте первым!</p>
+{% endif %}  </div>
 
   <!-- Форма добавления комментария -->
   <div class="mb-4">

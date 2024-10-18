@@ -65,19 +65,18 @@ class TagForm(forms.ModelForm):
         return name
 
 
-
-
-
 class PostForm(forms.ModelForm):
     category = forms.ModelChoiceField(
         queryset=Category.objects.all(),
+        empty_label="Выберите категорию",
         widget=forms.Select(attrs={'class': 'form-control'}),
-        empty_label="Выберите категорию"
+        label='Категория'
     )
+
     tags = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите теги через запятую'}),
-        required=False
-    )
+    required=False,
+    widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите теги через запятую'})
+)
 
     class Meta:
         model = Post
@@ -85,12 +84,31 @@ class PostForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'tags': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите теги через запятую'}),
             'cover_image': forms.FileInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'title': 'Заголовок',
             'text': 'Текст поста',
-            'category': 'Категория',
             'tags': 'Теги',
             'cover_image': 'Обложка',
         }
+
+    def clean_tags(self):
+        tags = self.cleaned_data.get('tags')
+        if tags:
+            return [tag.strip().lower() for tag in tags.split(',') if tag.strip()]
+        return []
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            self._save_tags(instance)
+        return instance
+
+    def save_tags(self, instance):
+        instance.tags.clear()
+        for tag_name in self.cleaned_data.get('tags', []):
+            tag, _ = Tag.objects.get_or_create(name=tag_name)
+            instance.tags.add(tag)

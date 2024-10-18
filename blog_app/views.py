@@ -120,17 +120,8 @@ def add_post(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.status = 'draft'
             post.save()
-
-            # Обработка тегов
-            tags = form.cleaned_data['tags'].split(',')
-            for tag_name in tags:
-                tag_name = tag_name.strip().lower()
-                if tag_name:
-                    tag, _ = Tag.objects.get_or_create(name=tag_name)
-                    post.tags.add(tag)
-
+            form.save_tags(post)
             return render(request, "blog_app/add_post.html", {
                 "form": PostForm(),
                 "menu": menu,

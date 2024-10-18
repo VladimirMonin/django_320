@@ -135,7 +135,7 @@ footer {
     height: 100%;
     object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
 }
-
+ 
 .post-image-container {
   max-width: 800px;
   margin: 0 auto;
@@ -144,4 +144,11 @@ footer {
 .post-image-container img {
   width: 100%;
   height: auto;
+}
+
+/* Разрешение переноса текста в блоках кода */
+pre, code {
+    white-space: pre-wrap;       /* Позволяет переносить строки внутри блоков */
+    word-wrap: break-word;       /* Позволяет переносить длинные слова */
+    overflow-wrap: break-word;   /* Дополнительная поддержка переноса слов */
 }

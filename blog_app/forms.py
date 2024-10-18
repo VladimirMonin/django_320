@@ -1,5 +1,5 @@
 from django import forms
-from .models import Comment, Category, Tag
+from .models import Comment, Category, Tag, Post
 
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -63,3 +63,34 @@ class TagForm(forms.ModelForm):
         if Tag.objects.filter(name=name).exists():
             raise forms.ValidationError("Тег с таким названием уже существует.")
         return name
+
+
+
+
+
+class PostForm(forms.ModelForm):
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="Выберите категорию"
+    )
+    tags = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите теги через запятую'}),
+        required=False
+    )
+
+    class Meta:
+        model = Post
+        fields = ['title', 'text', 'category', 'tags', 'cover_image']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'cover_image': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'title': 'Заголовок',
+            'text': 'Текст поста',
+            'category': 'Категория',
+            'tags': 'Теги',
+            'cover_image': 'Обложка',
+        }

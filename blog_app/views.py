@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from .templatetags.md_to_html import markdown_to_html
-from .forms import CommentForm, CategoryForm, TagForm
+from .forms import CommentForm, CategoryForm, TagForm, PostForm
 from django.shortcuts import render, redirect
 from .models import Post, Tag
 from django.contrib import messages
@@ -113,51 +113,32 @@ def about(request) -> HttpResponse:
     return render(request, "about.html", context=context)
 
 
-
-
-
 def add_post(request):
-    context = {"menu": menu, "page_alias": "add_post"}
-
-    if request.method == "GET":
-        return render(request, "blog_app/add_post.html", context=context)
-
-    elif request.method == "POST":
-        title = request.POST["title"]
-        text = request.POST["text"]
-        tags = request.POST["tags"]  # строка: базы данных, еще тег, sql
-
-        if Post.objects.filter(title=title).exists():
-            context.update({"message": "Такой заголовок уже существует!"})
-            return render(request, "blog_app/add_post.html", context=context)
-
-        user = request.user
-
-        if title and text and tags:
-            post = Post.objects.create(title=title, text=text, author=user)
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.status = 'draft'
+            post.save()
 
             # Обработка тегов
-            tag_list = [
-                tag.strip().lower().replace(" ", "_")
-                for tag in tags.split(",")
-                if tag.strip()
-            ]
-            for tag_name in tag_list:
-                # Если тег есть, добываем, если нет, создаем. В переменной в любом случае будет объект модели Tag
-                tag, created = Tag.objects.get_or_create(name=tag_name)
-                # Создаем связь между этим тегом и постом
-                post.tags.add(tag)
+            tags = form.cleaned_data['tags'].split(',')
+            for tag_name in tags:
+                tag_name = tag_name.strip().lower()
+                if tag_name:
+                    tag, _ = Tag.objects.get_or_create(name=tag_name)
+                    post.tags.add(tag)
 
-            context.update({"message": "Пост успешно добавлен!"})
-            # return redirect('post_by_slug', post_slug=post.slug)
-            # Альтернативный вариант, вернуть пользователя на фомру, показать сообщение об успехе
-            return render(request, "blog_app/add_post.html", context=context)
+            return render(request, "blog_app/add_post.html", {
+                "form": PostForm(),
+                "menu": menu,
+                "message": "Пост успешно создан и отправлен на модерацию."
+            })
+    else:
+        form = PostForm()
 
-        else:
-            context.update({"message": "Заполните все поля!"})
-            return render(request, "blog_app/add_post.html", context=context)
-
-    return render(request, "blog_app/add_post.html", context=context)
+    return render(request, 'blog_app/add_post.html', {'form': form, 'menu': menu})
 
 
 def posts_by_tag(request, tag):

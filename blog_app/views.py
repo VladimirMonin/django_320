@@ -59,11 +59,12 @@ def blog(request):
 
 def post_by_slug(request, post_slug):
     post = get_object_or_404(Post, slug=post_slug)
-    # Проверяем, был ли уже просмотр поста в текущей сессии
+    
     if f'post_{post.id}_viewed' not in request.session:
-        post.views = F('views') + 1
-        post.save(update_fields=['views'])
+        Post.objects.filter(id=post.id).update(views=F('views') + 1)
         request.session[f'post_{post.id}_viewed'] = True
+    
+    post.refresh_from_db()  # Обновляем объект post после изменения
 
     if request.method == 'POST':
         if request.user.is_authenticated:

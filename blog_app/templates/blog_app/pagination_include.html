@@ -1,9 +1,11 @@
 {% if page_obj.has_other_pages %}
 <nav aria-label="Page navigation">
+
     <!-- Десктопная версия -->
     <ul class="pagination justify-content-center d-none d-md-flex">
         {% if page_obj.has_previous %}
             <li class="page-item">
+
                 <a class="page-link" href="?page=1">« Первая</a>
             </li>
             <li class="page-item">
@@ -22,10 +24,12 @@
                 <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперед</a>
             </li>
             <li class="page-item">
+
                 <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
             </li>
         {% endif %}
     </ul>
+
 
     <!-- Мобильная версия -->
     <ul class="pagination justify-content-between d-flex d-md-none">

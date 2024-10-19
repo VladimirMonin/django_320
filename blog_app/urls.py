@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import post_by_slug, blog, add_post, posts_by_tag, posts_by_category, preview_post, add_category, add_tag
+from .views import post_by_slug, blog, add_post, posts_by_tag, posts_by_category, preview_post, add_category, add_tag, update_category
 
 urlpatterns = [
     path("<slug:post_slug>/view/", post_by_slug, name="post_by_slug"),
@@ -8,7 +8,9 @@ urlpatterns = [
     # Формы
     path("add_post/", add_post, name="add_post"),
     path("add_category/", add_category, name="add_category"),
+    path("update_category/<slug:category>/", update_category, name="update_category"),
     path("add_tag/", add_tag, name="add_tag"),
+
     
     # Посты по тегам
     path('tag/<slug:tag>/', posts_by_tag, name='posts_by_tag'),

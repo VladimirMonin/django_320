@@ -200,6 +200,40 @@ def add_category(request):
         return render(request, "blog_app/add_category.html", context)
     
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import Category
+
+def update_category(request, category):
+    """
+    Вью для обновления названия категории.
+    """
+    # Получаем объект категории по слагу
+    category_obj = get_object_or_404(Category, slug=category)
+    
+    if request.method == "POST":
+        new_name = request.POST.get('name', '').strip()
+        
+        if not new_name:
+            messages.error(request, "Название категории не может быть пустым.")
+        else:
+            # Проверяем, существует ли уже категория с таким названием
+            if Category.objects.filter(name__iexact=new_name).exclude(id=category_obj.id).exists():
+                messages.error(request, f"Категория с названием '{new_name}' уже существует.")
+            else:
+                category_obj.name = new_name
+                category_obj.save()
+                messages.success(request, f"Категория '{new_name}' успешно обновлена.")
+                return render(request, 'blog_app/update_category.html', {'category': category_obj, 'menu': menu, 'page_alias': 'blog'})
+    
+    context = {
+        'category': category_obj,
+        'menu': menu,
+        'page_alias': 'blog',
+    }
+    return render(request, 'blog_app/update_category.html', context)
+
+
 def add_tag(request):
     """
     Будет использовать форму связанную с моделью Tag - TagForm

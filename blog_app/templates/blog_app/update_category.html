@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Обновить категорию{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Обновить категорию</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="POST" action="">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="categoryName" class="form-label">Название категории</label>
+            <input type="text" class="form-control" id="categoryName" name="name" value="{{ category.name }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="{% url 'posts_by_category' category.slug %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

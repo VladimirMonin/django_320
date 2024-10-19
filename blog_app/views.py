@@ -121,18 +121,25 @@ def add_post(request):
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            form.save_tags(post)
-            return render(request, "blog_app/add_post.html", {
-                "form": PostForm(),
-                "menu": menu,
-                "message": "Пост успешно создан и отправлен на модерацию."
-            })
+            post = form.save(commit=True, author=request.user)
+            messages.success(request, 'Пост успешно создан и отправлен на модерацию.')
+            return redirect('add_post')
     else:
         form = PostForm()
 
+    return render(request, 'blog_app/add_post.html', {'form': form, 'menu': menu})
+
+def update_post(request, post_slug):
+    post = get_object_or_404(Post, slug=post_slug)
+
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Пост успешно обновлен и отправлен на модерацию.')
+            return redirect('update_post', post_slug=post_slug)
+    else:
+        form = PostForm(instance=post)
     return render(request, 'blog_app/add_post.html', {'form': form, 'menu': menu})
 
 

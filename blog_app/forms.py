@@ -67,6 +67,12 @@ class TagForm(forms.ModelForm):
 
 
 class PostForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            # Если это существующий пост, заполняем поле тегов
+            self.initial['tags'] = ', '.join([tag.name for tag in self.instance.tags.all()])
     category = forms.ModelChoiceField(
         queryset=Category.objects.all(),
         empty_label="Выберите категорию",
@@ -98,18 +104,23 @@ class PostForm(forms.ModelForm):
     def clean_tags(self):
         tags = self.cleaned_data.get('tags')
         if tags:
-            return [tag.strip().lower() for tag in tags.split(',') if tag.strip()]
+            return [tag.strip().lower().replace(' ', '_') for tag in tags.split(',') if tag.strip()]
         return []
 
-    def save(self, commit=True):
+    def save(self, commit=True, author=None):
         instance = super().save(commit=False)
+        if author:
+            instance.author = author
         if commit:
             instance.save()
-            self._save_tags(instance)
+            self.save_tags(instance)
         return instance
 
     def save_tags(self, instance):
         instance.tags.clear()
-        for tag_name in self.cleaned_data.get('tags', []):
+        tag_names = self.cleaned_data.get('tags', [])
+        if isinstance(tag_names, str):
+            tag_names = [tag.strip().lower().replace(' ', '_') for tag in tag_names.split(',') if tag.strip()]
+        for tag_name in tag_names:
             tag, _ = Tag.objects.get_or_create(name=tag_name)
             instance.tags.add(tag)

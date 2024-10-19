@@ -12,12 +12,13 @@ class CommentForm(forms.ModelForm):
             'text': 'Текст комментария',
         }
 
-class CategoryForm(forms.Form):
+class CategoryForm(forms.ModelForm):
     name = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите название категории'}),
     )
     
     class Meta:
+        model = Category
         fields = ['name']
         labels = {
             'name': 'Название категории',

@@ -12,6 +12,9 @@ from .models import Post, Tag
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+
+
+
 menu = [
     {"name": "Главная", "alias": "main"},
     {"name": "Блог", "alias": "blog"},
@@ -173,65 +176,50 @@ def preview_post(request):
         return JsonResponse({"html": html})
 
 
-
-
 def add_category(request):
     context = {"menu": menu}
-
-    if request.method == "GET":
-        form = CategoryForm()
-        context["form"] = form
-        return render(request, "blog_app/add_category.html", context)
-    
-    elif request.method == "POST":
-        form = CategoryForm(request.POST)
-        if form.is_valid():
-            # Добавим проверку, существует ли категория с таким именем
-            # if Category.objects.filter(name=form.cleaned_data['name']).exists():
-                # Помещаем ошибку в form
-                # pass
-            # Если нет
-            name = form.cleaned_data['name']
-            Category.objects.create(name=name)
-            # Добавляем ключ message о том что категория добавлена
-            context["message"] = f"Категория {name} успешно добавлена!"
-            return render(request, "blog_app/add_category.html", context)
-        context["form"] = form
-        return render(request, "blog_app/add_category.html", context)
-    
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import Category
-
-def update_category(request, category):
-    """
-    Вью для обновления названия категории.
-    """
-    # Получаем объект категории по слагу
-    category_obj = get_object_or_404(Category, slug=category)
     
     if request.method == "POST":
-        new_name = request.POST.get('name', '').strip()
-        
-        if not new_name:
-            messages.error(request, "Название категории не может быть пустым.")
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Категория '{form.cleaned_data['name']}' успешно добавлена!")
+            return redirect('add_category')
         else:
-            # Проверяем, существует ли уже категория с таким названием
-            if Category.objects.filter(name__iexact=new_name).exclude(id=category_obj.id).exists():
-                messages.error(request, f"Категория с названием '{new_name}' уже существует.")
-            else:
-                category_obj.name = new_name
-                category_obj.save()
-                messages.success(request, f"Категория '{new_name}' успешно обновлена.")
-                return render(request, 'blog_app/update_category.html', {'category': category_obj, 'menu': menu, 'page_alias': 'blog'})
+            messages.error(request, "Пожалуйста, исправьте ошибки ниже.")
+    else:
+        form = CategoryForm()
     
-    context = {
-        'category': category_obj,
-        'menu': menu,
-        'page_alias': 'blog',
-    }
-    return render(request, 'blog_app/update_category.html', context)
+    context.update({
+        "form": form,
+        "operation_title": "Добавить категорию",
+        "operation_header": "Добавить новую категорию",
+        "submit_button_text": "Создать",
+    })
+    return render(request, "blog_app/category_form.html", context)
+
+def update_category(request, category_slug):
+    category_obj = get_object_or_404(Category, slug=category_slug)
+    context = {"menu": menu, "category": category_obj}
+
+    if request.method == "POST":
+        form = CategoryForm(request.POST, instance=category_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Категория '{form.cleaned_data['name']}' успешно обновлена.")
+            return redirect('posts_by_category', category=category_obj.slug)
+        else:
+            messages.error(request, "Пожалуйста, исправьте ошибки ниже.")
+    else:
+        form = CategoryForm(instance=category_obj)
+    
+    context.update({
+        "form": form,
+        "operation_title": "Обновить категорию",
+        "operation_header": "Обновить категорию",
+        "submit_button_text": "Сохранить",
+    })
+    return render(request, "blog_app/category_form.html", context)
 
 
 def add_tag(request):

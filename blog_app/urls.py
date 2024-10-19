@@ -8,7 +8,7 @@ urlpatterns = [
     # Формы
     path("add_post/", add_post, name="add_post"),
     path("add_category/", add_category, name="add_category"),
-    path("update_category/<slug:category>/", update_category, name="update_category"),
+    path("update_category/<slug:category_slug>/", update_category, name="update_category"),
     path("add_tag/", add_tag, name="add_tag"),
 
     

@@ -34,6 +34,10 @@ templates/base.html
       {% endblock %}
     </header>
 
+    {% block breadcrumbs %}
+    <!-- Хлебные крошки будут вставляться здесь -->
+    {% endblock %}
+
     <main>
       {% block content %}{% endblock %}
     </main>
@@ -55,7 +59,7 @@ templates/base.html
 
     <footer class="bg-dark text-light py-3">
       <div class="container text-center">
-        <p>&copy; 2024 Академия "Top"</p>
+        <p>© 2024 Академия "Top"</p>
         <p>Группа Python320</p>
       </div>
     </footer>

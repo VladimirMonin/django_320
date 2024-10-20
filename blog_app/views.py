@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from .models import Post, Tag
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.urls import reverse
 # Декоратор для ограничения доступа к определенным страницам - @login_required, @permission_required
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -27,7 +27,7 @@ def blog(request):
     search_category = request.GET.get("search_category")
     search_tag = request.GET.get("search_tag")
     search_comments = request.GET.get("search_comments")
-    page_number = request.GET.get('page', 1)  # Получаем номер страницы из URL-параметра 'page' /blog/?page=2
+    page_number = request.GET.get('page', 1)
     
     posts = Post.objects.prefetch_related('tags', 'comments').select_related('author', 'category').filter(status="published")
 
@@ -47,26 +47,40 @@ def blog(request):
 
     posts = posts.distinct().order_by("-created_at")
 
-    paginator = Paginator(posts, 2) # первый аргумент - кверисет, второй - сколько объектов на странице
+    paginator = Paginator(posts, 2)
 
     try:
         posts = paginator.page(page_number)
     except PageNotAnInteger:
-        posts = paginator.page(1)  # Если параметр page не число, показываем первую страницу
+        posts = paginator.page(1)
     except EmptyPage:
-        posts = paginator.page(paginator.num_pages)  # Если страница вне диапазона, показываем последнюю
+        posts = paginator.page(paginator.num_pages)
 
-    context = {"posts": posts, "menu": menu, "page_alias": "blog"}
-    return render(request, "blog_app/blog.html", context=context)
+    breadcrumbs = [
+        {'name': 'Главная', 'url': reverse('main')},
+        {'name': 'Блог'},
+    ]
+    return render(request, 'blog_app/blog.html', {
+        'posts': posts,
+        'breadcrumbs': breadcrumbs,
+        'menu': menu,
+        'page_alias': 'blog'
+    })
+
 
 
 def post_by_slug(request, post_slug):
     post = get_object_or_404(Post, slug=post_slug)
-    
+    breadcrumbs = [
+        {'name': 'Главная', 'url': reverse('main')},
+        {'name': 'Блог', 'url': reverse('blog')},
+        {'name': post.title}
+    ]
+
     if f'post_{post.id}_viewed' not in request.session:
         Post.objects.filter(id=post.id).update(views=F('views') + 1)
         request.session[f'post_{post.id}_viewed'] = True
-    
+
     post.refresh_from_db()  # Обновляем объект post после изменения
 
     if request.method == 'POST':
@@ -87,7 +101,7 @@ def post_by_slug(request, post_slug):
     else:
         form = CommentForm()
 
-     # Пагинация комментариев
+    # Пагинация комментариев
     comments_list = post.comments.filter(status='accepted').order_by('-created_at')
     paginator = Paginator(comments_list, 2)  # 5 комментариев на страницу
     page_number = request.GET.get('page')
@@ -103,18 +117,25 @@ def post_by_slug(request, post_slug):
         'post': post,
         'form': form,
         'comments': comments_page,
+        'breadcrumbs': breadcrumbs,
     }
 
     return render(request, 'blog_app/post_detail.html', context)
-
 def index(request) -> HttpResponse:
     context = {"menu": menu, "page_alias": "main"}
     return render(request, "index.html", context=context)
 
 
-def about(request) -> HttpResponse:
-    context = {"menu": menu, "page_alias": "about"}
-    return render(request, "about.html", context=context)
+def about(request):
+    breadcrumbs = [
+        {'name': 'Главная', 'url': reverse('main')},
+        {'name': 'О проекте'},
+    ]
+    return render(request, 'about.html', {
+        'breadcrumbs': breadcrumbs,
+        'menu': menu,
+        'page_alias': 'about'
+    })
 
 @login_required
 def add_post(request):

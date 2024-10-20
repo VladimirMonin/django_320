@@ -47,7 +47,7 @@ def blog(request):
 
     posts = posts.distinct().order_by("-created_at")
 
-    paginator = Paginator(posts, 2)
+    paginator = Paginator(posts, 4)
 
     try:
         posts = paginator.page(page_number)
@@ -102,8 +102,8 @@ def post_by_slug(request, post_slug):
         form = CommentForm()
 
     # Пагинация комментариев
-    comments_list = post.comments.filter(status='accepted').order_by('-created_at')
-    paginator = Paginator(comments_list, 2)  # 5 комментариев на страницу
+    comments_list = post.comments.filter(status='accepted').order_by('created_at')
+    paginator = Paginator(comments_list, 20)  # 5 комментариев на страницу
     page_number = request.GET.get('page')
 
     try:

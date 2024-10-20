@@ -1,37 +1,28 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load md_to_html %}
+
 {% block content %}
+<div class="container mt-4">
 
-<div class="container">
+  <h1 class="mb-4">Добавить пост</h1>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
   <div class="row">
-    <!-- Форма и аккордеон -->
-    <div class="col-12">
-      <div class="d-flex flex-column flex-md-row align-items-start">
-        <!-- Аккордеон для предпросмотра -->
-        <div class="accordion flex-md-fill me-md-3 order-md-1 w-100" id="previewAccordion">
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="previewHeading">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#previewCollapse" aria-expanded="true" aria-controls="previewCollapse">
-                Предпросмотр
-              </button>
-            </h2>
-            <div id="previewCollapse" class="accordion-collapse collapse show" aria-labelledby="previewHeading" data-bs-parent="#previewAccordion">
-              <div class="accordion-body">
-                <!-- Контейнер для отображения предпросмотра -->
-                <div id="preview"></div>
-              </div>
-            </div>
-          </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card">
+        <div class="card-header">
+          Форма поста
         </div>
-
-        <!-- Форма для добавления поста -->
-        <div class="flex-md-fill mt-3 mt-md-0 order-md-2 w-100">
-          <h1>Добавить пост</h1>
-          {% if message %}
-          <!-- Отображение сообщения об успешном добавлении поста -->
-          <div class="alert alert-success">{{ message }}</div>
-          {% endif %}
+        <div class="card-body">
           <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {% for field in form %}
@@ -39,8 +30,7 @@
                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                 {{ field }}
                 {% if field.errors %}
-                  <!-- Отображение ошибок валидации формы -->
-                  <div class="alert alert-danger">
+                  <div class="text-danger">
                     {{ field.errors }}
                   </div>
                 {% endif %}
@@ -51,13 +41,27 @@
         </div>
       </div>
     </div>
+    
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          Предпросмотр
+        </div>
+        <div class="card-body">
+          <div id="preview" style="max-height: 600px; overflow-y: auto;">
+            <!-- Здесь будет отображаться предпросмотр -->
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
+{% block scripts %}
+{{ block.super }}
 <script>
 let timeout = null;
 
-// Функция для отправки запроса на предпросмотр
 async function sendPreviewRequest(text) {
     const response = await fetch('{% url "preview_post" %}', {
         method: 'POST',
@@ -68,18 +72,15 @@ async function sendPreviewRequest(text) {
         body: JSON.stringify({text: text})
     });
     const data = await response.json();
-    // Обновление содержимого предпросмотра
     document.getElementById('preview').innerHTML = data.html;
-    // Подсветка синтаксиса кода
     hljs.highlightAll();
 }
 
-// Обработчик события ввода текста
 document.getElementById('id_text').addEventListener('input', function() {
     clearTimeout(timeout);
-    // Отложенный запрос на предпросмотр для оптимизации производительности
-    timeout = setTimeout(() => sendPreviewRequest(this.value), 1000);
+    timeout = setTimeout(() => sendPreviewRequest(this.value), 500);
 });
 </script>
+{% endblock %}
 
 {% endblock %}

@@ -103,15 +103,14 @@
   <!-- Форма добавления комментария -->
   <div class="mb-4">
     <h3>Оставить комментарий</h3>
-    {% if user.is_authenticated %}
-      <form method="post">
-        {% csrf_token %}
+    <form method="post" action="{% if user.is_authenticated %}{% url 'post_by_slug' post.slug %}{% else %}{% url 'login' %}?next={{ request.path }}{% endif %}">
+      {% csrf_token %}
+      {% if user.is_authenticated %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-dark">Отправить</button>
-      </form>
-    {% else %}
-      <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a>, чтобы оставить комментарий.</p>
-    {% endif %}
-  </div>
-</div>
+      {% else %}
+        <p>Пожалуйста, <button type="submit" class="btn btn-link p-0 m-0 align-baseline">войдите</button>, чтобы оставить комментарий.</p>
+      {% endif %}
+    </form>
+  </div></div>
 {% endblock %}

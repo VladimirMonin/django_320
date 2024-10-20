@@ -1,24 +1,32 @@
+{# Форма поиска с методом GET и классом для отступа #}
 <form action="{% url 'blog' %}" method="get" class="mb-4">
+    {# Группа ввода для поискового запроса #}
     <div class="input-group mb-3">
+        {# Поле ввода для поискового запроса #}
         <input type="text" name="search" class="form-control" placeholder="Поиск по постам..." value="{{ request.GET.search }}">
+        {# Кнопка отправки формы #}
         <button class="btn btn-warning" type="submit">
             <i class="bi bi-search"></i>
             <span class="d-none d-sm-inline ms-1">Поиск</span>
         </button>
     </div>
+    {# Контейнер для чекбоксов с гибкой разметкой #}
     <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center">
+        {# Чекбокс для поиска по категории #}
         <div class="form-check me-sm-4 mb-2 mb-sm-0">
             <input class="form-check-input" type="checkbox" name="search_category" id="searchCategory" {% if request.GET.search_category %}checked{% endif %}>
             <label class="form-check-label" for="searchCategory">
                 <i class="bi bi-tags me-1 text-warning"></i> Поиск по категории
             </label>
         </div>
+        {# Чекбокс для поиска по тегу #}
         <div class="form-check me-sm-4 mb-2 mb-sm-0">
             <input class="form-check-input" type="checkbox" name="search_tag" id="searchTag" {% if request.GET.search_tag %}checked{% endif %}>
             <label class="form-check-label" for="searchTag">
                 <i class="bi bi-hash me-1 text-success"></i> Поиск по тегу
             </label>
         </div>
+        {# Чекбокс для поиска по комментариям #}
         <div class="form-check">
             <input class="form-check-input" type="checkbox" name="search_comments" id="searchComments" {% if request.GET.search_comments %}checked{% endif %}>
             <label class="form-check-label" for="searchComments">

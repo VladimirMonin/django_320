@@ -7,6 +7,7 @@
 
   <h1 class="mb-4">Добавить пост</h1>
 
+  {# Отображение сообщений об успехе или ошибках #}
   {% if messages %}
     {% for message in messages %}
       <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -23,6 +24,7 @@
           Форма поста
         </div>
         <div class="card-body">
+          {# Форма для создания нового поста #}
           <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {% for field in form %}
@@ -48,6 +50,7 @@
           Предпросмотр
         </div>
         <div class="card-body">
+          {# Область для отображения предпросмотра поста #}
           <div id="preview" style="max-height: 600px; overflow-y: auto;">
             <!-- Здесь будет отображаться предпросмотр -->
           </div>
@@ -62,6 +65,7 @@
 <script>
 let timeout = null;
 
+{# Функция для отправки запроса на предпросмотр #}
 async function sendPreviewRequest(text) {
     const response = await fetch('{% url "preview_post" %}', {
         method: 'POST',
@@ -76,6 +80,7 @@ async function sendPreviewRequest(text) {
     hljs.highlightAll();
 }
 
+{# Обработчик события ввода текста для реализации живого предпросмотра #}
 document.getElementById('id_text').addEventListener('input', function() {
     clearTimeout(timeout);
     timeout = setTimeout(() => sendPreviewRequest(this.value), 500);

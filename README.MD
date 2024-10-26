@@ -1031,3 +1031,28 @@ pip install django-debug-toolbar
 
 `Prefetch_related` - используется для оптимизации запросов при отношении многие-ко-многим. Он позволяет избежать N+1 запросов, когда вы запрашиваете связанные объекты.
 
+### Объект `Prefetch`
+
+Идея для загрузки ВСЕГО в детальном отображении поста.
+```python
+def post_by_slug(request, post_slug):
+    # Получаем пост со всеми связанными данными одним запросом
+    post = get_object_or_404(
+        Post.objects.select_related('author', 'category')
+        .prefetch_related('tags')
+        .prefetch_related(
+            Prefetch(
+                'comments',
+                queryset=Comment.objects.select_related('author')
+                .filter(status='accepted')
+                .order_by('created_at')
+                .only('text', 'created_at', 'author__username'),
+                to_attr='filtered_comments'
+            )
+        ),
+        slug=post_slug
+    )
+
+    # Остальная логика view остается той же
+
+```

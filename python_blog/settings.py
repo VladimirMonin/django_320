@@ -137,10 +137,15 @@ INTERNAL_IPS = [
 LOGIN_REDIRECT_URL = 'main'  # Перенаправление после успешного входа
 LOGIN_URL = 'login'  # URL страницы входа
 
-
+# Настройки бекендов для аутентификации
 AUTHENTICATION_BACKENDS = [
     'users.authentication.EmailAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+# Пользовательская модель пользователя
 AUTH_USER_MODEL = 'users.User'
+
+# Настройки для отправки писем (в консоль)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+

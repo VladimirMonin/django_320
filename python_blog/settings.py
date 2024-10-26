@@ -146,6 +146,14 @@ AUTHENTICATION_BACKENDS = [
 # Пользовательская модель пользователя
 AUTH_USER_MODEL = 'users.User'
 
-# Настройки для отправки писем (в консоль)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Настройки для отправки писем (через SMTP сервер - реальные емейлы!)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+SERVER_EMAIL = os.getenv('SERVER_EMAIL')
+EMAIL_ADMIN = os.getenv('EMAIL_ADMIN')

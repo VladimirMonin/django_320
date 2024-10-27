@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
 # Декоратор для ограничения доступа к определенным страницам - @login_required, @permission_required
 from django.contrib.auth.decorators import login_required, permission_required
-from django.views.generic import View, TemplateView
+from django.views.generic import View, TemplateView, CreateView, UpdateView
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
@@ -315,6 +315,7 @@ def update_category(request, category_slug):
     return render(request, "blog_app/category_form.html", context)
 
 @login_required
+
 def add_tag(request):
     """
     Будет использовать форму связанную с моделью Tag - TagForm
@@ -339,3 +340,16 @@ def add_tag(request):
         context["form"] = form
         return render(request, "blog_app/add_tag.html", context)
     
+
+class AddTagView(LoginRequiredMixin, CreateView):
+    """
+    Класс-представление для добавления тега.
+    Наследуется от CreateView для создания объектов и LoginRequiredMixin для ограничения доступа
+    только авторизованным пользователям
+    """
+    # Указываем модель, с которой будет работать представление
+    model = Tag
+    # Указываем путь к шаблону, который будет использоваться для отображения формы
+    template_name = "blog_app/add_tag.html"
+    # Определяем поля модели, которые будут отображаться в форме
+    fields = ["name"]

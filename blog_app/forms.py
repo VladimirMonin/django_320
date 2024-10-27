@@ -1,5 +1,7 @@
 from django import forms
 from .models import Comment, Category, Tag, Post
+from django.utils.text import slugify
+from unidecode import unidecode
 
 class CommentForm(forms.ModelForm):
     class Meta:
@@ -50,21 +52,15 @@ class TagForm(forms.ModelForm):
         model = Tag
         fields = ['name']
 
-    def save(self, commit=True):
-        """
-        Тут можно переопределить логику сохранения. 
-        Как правило это добавление связанных данных или т.п.
-        """
-        return tag
-    
     def clean_name(self):
-
-        # TODO проверить HTML html - одно вызовет ошибку формы, другое упадет уже из базы
-        name = self.cleaned_data['name']
-        if Tag.objects.filter(name=name).exists():
+        name = self.cleaned_data['name'].lower().strip().replace(' ', '_')
+        # Создаем slug таким же образом, как это делается в модели
+        slug = slugify(unidecode(name))
+        
+        # Проверяем существование тега как по имени, так и по slug
+        if Tag.objects.filter(name=name).exists() or Tag.objects.filter(slug=slug).exists():
             raise forms.ValidationError("Тег с таким названием уже существует.")
         return name
-
 
 class PostForm(forms.ModelForm):
 

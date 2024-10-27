@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from .models import Post, Tag
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 # Декоратор для ограничения доступа к определенным страницам - @login_required, @permission_required
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.generic import View, TemplateView, CreateView, UpdateView
@@ -353,9 +353,25 @@ class AddTagView(LoginRequiredMixin, CreateView):
     form_class = TagForm
     # Указываем путь к шаблону, который будет использоваться для отображения формы
     template_name = "blog_app/add_tag.html"
+    success_url = reverse_lazy("add_tag")
     
     # Передаем контекст через расширение метода get_context_data
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["menu"] = menu
         return context
+    
+    def form_valid(self, form):
+            """Метод вызывается при успешной валидации формы"""
+            # Сохраняем форму
+            response = super().form_valid(form)
+            # Добавляем сообщение об успехе
+            messages.success(self.request, f"Тег {form.instance.name} успешно добавлен!")
+            return response
+    
+    def form_invalid(self, form):
+        """Метод вызывается при неуспешной валидации формы"""
+        # Добавляем сообщение об ошибке
+        messages.error(self.request, "Ошибка при добавлении тега. Проверьте введенные данные.")
+        return super().form_invalid(form)
+    

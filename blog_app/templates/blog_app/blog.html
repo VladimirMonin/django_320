@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load cache %}
 
 {% comment %} Определение заголовка страницы {% endcomment %}
 {% block title %}Каталог постов{% endblock %}
@@ -21,13 +20,7 @@
     
     {% comment %} Подключение формы поиска {% endcomment %}
     {% include 'blog_app/search_form.html' %}
-    {% comment %} 
-    300 - время кеширования в секундах
-    blog_post_list - название кеша
-    page_obj.number - номер текущей страницы (Позволяет правильно кешировать постранично)
-    {% endcomment %}
-    {% comment %} Начало кеширования списка постов {% endcomment %}
-    {% cache 60 blog_post_list posts.number %}
+    
     <div class="row">
         {% comment %} Цикл для вывода постов {% endcomment %}
         {% for post in posts %}
@@ -44,18 +37,16 @@
             </div>
         {% endfor %}
     </div>
-    {% comment %} Пагинатор {% endcomment %}
-    {% comment %} Проверяем, что есть другие страницы {% endcomment %}
-    {% comment %} Создание контекста для пагинации {% endcomment %}
+
+    {% comment %} Пагинация {% endcomment %}
     {% with page_obj=posts %}
-    {% if page_obj.has_other_pages %}
-    {% comment %} Подключение шаблона пагинации {% endcomment %}
-    {% include 'blog_app/pagination_include.html' %}
-    {% endif %}
+        {% if page_obj.has_other_pages %}
+            {% include 'blog_app/pagination_include.html' %}
+        {% endif %}
     {% endwith %}
-    {% endcache %}
 </div>
 {% endblock %}
+
 {% comment %} Подключение скриптов {% endcomment %}
 {% block scripts %}
 <script src="{% static 'js/main.js' %}"></script>

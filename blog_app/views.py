@@ -25,50 +25,48 @@ menu = [
     {"name": "Добавить пост", "alias": "add_post"},
 ]
 
-def blog(request):
-    search_query = request.GET.get("search", "")
-    search_category = request.GET.get("search_category")
-    search_tag = request.GET.get("search_tag")
-    search_comments = request.GET.get("search_comments")
-    page_number = request.GET.get('page', 1)
-    
-    posts = Post.objects.prefetch_related('tags', 'comments').select_related('author', 'category').filter(status="published")
+class BlogView(ListView):
+    model = Post
+    template_name = 'blog_app/blog.html'
+    context_object_name = 'posts'
+    paginate_by = 4
 
-    if search_query:
-        query = Q(title__icontains=search_query) | Q(text__icontains=search_query) 
+    def get_queryset(self):
+        # Базовый QuerySet с предзагрузкой связанных данных
+        queryset = Post.objects.prefetch_related('tags', 'comments').select_related('author', 'category').filter(status="published")
         
-        if search_category:
-            query |= Q(category__name__icontains=search_query)
-        
-        if search_tag:
-            query |= Q(tags__name__icontains=search_query)
-        
-        if search_comments:
-            query |= Q(comment__text__icontains=search_query)
-        
-        posts = posts.filter(query)
+        # Получаем параметры поиска из GET-запроса
+        search_query = self.request.GET.get("search", "")
+        search_category = self.request.GET.get("search_category")
+        search_tag = self.request.GET.get("search_tag")
+        search_comments = self.request.GET.get("search_comments")
 
-    posts = posts.distinct().order_by("-created_at")
+        if search_query:
+            query = Q(title__icontains=search_query) | Q(text__icontains=search_query)
+            
+            if search_category:
+                query |= Q(category__name__icontains=search_query)
+            
+            if search_tag:
+                query |= Q(tags__name__icontains=search_query)
+            
+            if search_comments:
+                query |= Q(comments__text__icontains=search_query)
+            
+            queryset = queryset.filter(query)
 
-    paginator = Paginator(posts, 4)
+        return queryset.distinct().order_by("-created_at")
 
-    try:
-        posts = paginator.page(page_number)
-    except PageNotAnInteger:
-        posts = paginator.page(1)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['page_alias'] = 'blog'
+        context['breadcrumbs'] = [
+            {'name': 'Главная', 'url': reverse('main')},
+            {'name': 'Блог'},
+        ]
+        return context
 
-    breadcrumbs = [
-        {'name': 'Главная', 'url': reverse('main')},
-        {'name': 'Блог'},
-    ]
-    return render(request, 'blog_app/blog.html', {
-        'posts': posts,
-        'breadcrumbs': breadcrumbs,
-        'menu': menu,
-        'page_alias': 'blog'
-    })
 
 
 

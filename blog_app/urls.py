@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     post_by_slug,
-    blog,
+    BlogView,
     add_post,
     PostsByTagListView,
     posts_by_category,
@@ -14,7 +14,7 @@ from .views import (
 
 urlpatterns = [
     path("<slug:post_slug>/view/", post_by_slug, name="post_by_slug"),
-    path("", blog, name="blog"),
+    path("", BlogView.as_view(), name="blog"),
     
     # Формы
     path("add_post/", add_post, name="add_post"),

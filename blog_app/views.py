@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
 # Декоратор для ограничения доступа к определенным страницам - @login_required, @permission_required
 from django.contrib.auth.decorators import login_required, permission_required
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 
 menu = [
     {"name": "Главная", "alias": "main"},
@@ -122,11 +122,20 @@ def post_by_slug(request, post_slug):
     }
 
     return render(request, 'blog_app/post_detail.html', context)
-def index(request) -> HttpResponse:
-    context = {"menu": menu, "page_alias": "main"}
-    return render(request, "index.html", context=context)
 
 
+class IdexView(TemplateView):
+    # Указываем имя шаблона для отображения страницы
+    template_name = "index.html"
+
+    def get_context_data(self, **kwargs):
+        # Получаем базовый контекст от родительского класса
+        context = super().get_context_data(**kwargs)
+        # Добавляем в контекст глобальное меню сайта
+        context["menu"] = menu
+        # Устанавливаем идентификатор текущей страницы
+        context["page_alias"] = "main"
+        return context
 
 class AboutView(View):
     """

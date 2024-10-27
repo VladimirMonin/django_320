@@ -1,12 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
-from blog_app.views import index, AboutView
+from blog_app.views import index, AboutView, IdexView
 from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", index, name="main"),
+    path("", IdexView.as_view(), name="main"),
     path("about/", AboutView.as_view(), name="about"), # as_view() - это метод класса-представления, который возвращает экземпляр класса-представления, готовый к обработке запроса.
     
     # Через include подключим blog_app.urls

@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse, reverse_lazy
 # Декоратор для ограничения доступа к определенным страницам - @login_required, @permission_required
 from django.contrib.auth.decorators import login_required, permission_required
-from django.views.generic import View, TemplateView, CreateView, UpdateView
+from django.views.generic import View, TemplateView, CreateView, UpdateView, ListView, DetailView, DeleteView
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
@@ -199,18 +199,27 @@ def update_post(request, post_slug):
     return render(request, 'blog_app/add_post.html', {'form': form, 'menu': menu})
 
 
-def posts_by_tag(request, tag):
+class PostsByTagListView(ListView):
     """
-    Функция представления для отображения страницы постов с определенным тегом.
+    Класс-представление для отображения списка постов по тегу.
     """
-    context = {
-        # Можно получить все посты со стороны тега, используя related_name posts в модели Tag
-        # Tag.objects.get(slug=tag).posts.all()
-        "posts": Post.objects.filter(tags__slug=tag),
-        "menu": menu,
-        "page_alias": "blog",
-    }
-    return render(request, "blog_app/blog.html", context=context)
+    model = Post
+    template_name = 'blog_app/blog.html'
+    context_object_name = 'posts'
+    paginate_by = 4
+
+    def get_queryset(self):
+        tag = self.kwargs['tag']
+        posts = Post.objects.filter(tags__slug=tag).filter(status='published')
+        return posts
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['page_alias'] = 'blog'
+        return context
+
+
 
 
 def posts_by_category(request, category):

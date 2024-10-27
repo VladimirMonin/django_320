@@ -3,7 +3,7 @@ from .views import (
     post_by_slug,
     blog,
     add_post,
-    posts_by_tag,
+    PostsByTagListView,
     posts_by_category,
     preview_post,
     AddCategoryView,
@@ -25,7 +25,7 @@ urlpatterns = [
 
 
     # Посты по тегам
-    path('tag/<slug:tag>/', posts_by_tag, name='posts_by_tag'),
+    path('tag/<slug:tag>/', PostsByTagListView.as_view(), name='posts_by_tag'),
     # Посты по категориям
     path('category/<slug:category>/', posts_by_category, name='posts_by_category'),
     

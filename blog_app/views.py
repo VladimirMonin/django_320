@@ -349,7 +349,13 @@ class AddTagView(LoginRequiredMixin, CreateView):
     """
     # Указываем модель, с которой будет работать представление
     model = Tag
+    # Указываем форму, которую мы описали в froms.py
+    form_class = TagForm
     # Указываем путь к шаблону, который будет использоваться для отображения формы
     template_name = "blog_app/add_tag.html"
-    # Определяем поля модели, которые будут отображаться в форме
-    fields = ["name"]
+    
+    # Передаем контекст через расширение метода get_context_data
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["menu"] = menu
+        return context

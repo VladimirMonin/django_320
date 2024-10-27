@@ -14,6 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
 # Декоратор для ограничения доступа к определенным страницам - @login_required, @permission_required
 from django.contrib.auth.decorators import login_required, permission_required
+from django.views.generic import View
 
 menu = [
     {"name": "Главная", "alias": "main"},
@@ -126,16 +127,37 @@ def index(request) -> HttpResponse:
     return render(request, "index.html", context=context)
 
 
-def about(request):
-    breadcrumbs = [
+
+class AboutView(View):
+    """
+    Класс-представление для отображения страницы "О проекте".
+    
+    Методы:
+        get(request) - обрабатывает GET-запросы к странице
+        
+    Атрибуты:
+        breadcrumbs - список навигационных ссылок (хлебные крошки)
+        menu - глобальное меню сайта
+        page_alias - идентификатор текущей страницы
+        
+    Шаблон: about.html
+    
+    Контекст шаблона:
+        - breadcrumbs: список словарей с навигационными ссылками
+        - menu: список пунктов главного меню
+        - page_alias: строка-идентификатор страницы
+    """
+    def get(self, request):
+        breadcrumbs = [
         {'name': 'Главная', 'url': reverse('main')},
         {'name': 'О проекте'},
     ]
-    return render(request, 'about.html', {
-        'breadcrumbs': breadcrumbs,
-        'menu': menu,
-        'page_alias': 'about'
-    })
+        return render(request, 'about.html', {
+            'breadcrumbs': breadcrumbs,
+            'menu': menu,
+            'page_alias': 'about'
+
+        })    
 
 @login_required
 def add_post(request):

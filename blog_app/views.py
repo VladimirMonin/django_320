@@ -290,56 +290,46 @@ class AddCategoryView(LoginRequiredMixin, View):
             messages.error(request, "Пожалуйста, исправьте ошибки ниже.")
             return redirect('add_category')        
 
-@login_required
-def update_category(request, category_slug):
-    category_obj = get_object_or_404(Category, slug=category_slug)
-    context = {"menu": menu, "category": category_obj}
 
-    if request.method == "POST":
-        form = CategoryForm(request.POST, instance=category_obj)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f"Категория '{form.cleaned_data['name']}' успешно обновлена.")
-            return redirect('posts_by_category', category=category_obj.slug)
-        else:
-            messages.error(request, "Пожалуйста, исправьте ошибки ниже.")
-    else:
-        form = CategoryForm(instance=category_obj)
-    
-    context.update({
-        "form": form,
-        "operation_title": "Обновить категорию",
-        "operation_header": "Обновить категорию",
-        "submit_button_text": "Сохранить",
-    })
-    return render(request, "blog_app/category_form.html", context)
-
-@login_required
-
-def add_tag(request):
+class UpdateCategoryView(LoginRequiredMixin, UpdateView):
     """
-    Будет использовать форму связанную с моделью Tag - TagForm
-    Шаблон - add_tag.html
+    Класс-представление для обновления категории.
+    Наследуется от UpdateView для редактирования объектов и LoginRequiredMixin для ограничения доступа
+    только авторизованным пользователям
     """
-    context = {"menu": menu}
-
-    if request.method == "GET":
-        form = TagForm()
-        context["form"] = form
-        return render(request, "blog_app/add_tag.html", context)
+    model = Category
+    form_class = CategoryForm
+    template_name = "blog_app/category_form.html"
     
-    elif request.method == "POST":
-        form = TagForm(request.POST)
-        if form.is_valid():
-            # Так как форма связана с моделью мы можем использовать метод save() к форме
-            form.save()
-            # Добавляем ключ message о том что тег добавлен
-            name = form.cleaned_data['name']
-            context["message"] = f"Тег {name} успешно добавлен!"
-            return render(request, "blog_app/add_tag.html", context)
-        context["form"] = form
-        return render(request, "blog_app/add_tag.html", context)
+        
+    def get_object(self, queryset=None):
+        """Метод для получения объекта категории по slug из URL"""
+        return get_object_or_404(Category, slug=self.kwargs['category_slug'])
     
+    def get_success_url(self):
+        """Метод определяет URL для перенаправления после успешного обновления категории"""
+        # category/<slug:category>/
+        return reverse_lazy('posts_by_category', kwargs={'category': self.object.slug})
+    
+    def get_context_data(self, **kwargs):
+        """Метод для передачи дополнительных данных в контекст шаблона"""
+        context = super().get_context_data(**kwargs)
+        context["menu"] = menu
+        context["operation_title"] = "Обновить категорию"
+        context["operation_header"] = "Обновить категорию"
+        context["submit_button_text"] = "Сохранить"
+        return context
+    
+    def form_valid(self, form):
+        """Метод вызывается при успешной валидации формы"""
+        response = super().form_valid(form)
+        messages.success(self.request, f"Категория '{form.cleaned_data['name']}' успешно обновлена.")
+        return response
+    
+    def form_invalid(self, form):
+        """Метод вызывается при неуспешной валидации формы"""
+        messages.error(self.request, "Пожалуйста, исправьте ошибки ниже.")
+        return super().form_invalid(form)
 
 class AddTagView(LoginRequiredMixin, CreateView):
     """

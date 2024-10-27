@@ -5,11 +5,11 @@ from .views import (
     add_post,
     PostsByTagListView,
     posts_by_category,
-    preview_post,
     AddCategoryView,
     update_post,
     AddTagView,
-    UpdateCategoryView
+    UpdateCategoryView,
+    PreviewPostView,
 )
 
 urlpatterns = [
@@ -30,5 +30,5 @@ urlpatterns = [
     path('category/<slug:category>/', posts_by_category, name='posts_by_category'),
     
     # Маршрут для предпросмотра поста
-    path('preview/', preview_post, name='preview_post'),
+    path('preview/', PreviewPostView.as_view(), name='preview_post'),
 ]

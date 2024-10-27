@@ -236,17 +236,22 @@ def posts_by_category(request, category):
     return render(request, "blog_app/blog.html", context=context)
 
 
-# @csrf_exempt # Отключает проверку CSRF токена при пост запросах для этой вью
-def preview_post(request):
-    """
-    Вью которая работает на AJAX запросы, и дает предпросмотр постов при создании нового поста.
-    """
-    if request.method == "POST":
-        data = json.loads(request.body)
-        text = data.get("text", "")
-        html = markdown_to_html(text)
-        return JsonResponse({"html": html})
 
+class PreviewPostView(View):
+    """
+    Класс-представление для предпросмотра постов через AJAX
+    """
+    http_method_names = ['post']  # Явно указываем разрешенный метод
+    
+    def post(self, request, *args, **kwargs):
+        # Получаем данные из тела AJAX-запроса в формате JSON
+        data = json.loads(request.body)
+        # Извлекаем текст поста из данных с пустой строкой как значение по умолчанию
+        text = data.get("text", "")
+        # Преобразуем markdown-разметку в HTML для предпросмотра
+        html = markdown_to_html(text)
+        # Отправляем готовый HTML в формате JSON обратно клиенту
+        return JsonResponse({"html": html})
 
 class AddCategoryView(LoginRequiredMixin, View):
     """

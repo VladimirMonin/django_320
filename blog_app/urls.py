@@ -4,7 +4,7 @@ from .views import (
     BlogView,
     add_post,
     PostsByTagListView,
-    posts_by_category,
+    PostsByCategoryListView,
     AddCategoryView,
     update_post,
     AddTagView,
@@ -27,7 +27,7 @@ urlpatterns = [
     # Посты по тегам
     path('tag/<slug:tag>/', PostsByTagListView.as_view(), name='posts_by_tag'),
     # Посты по категориям
-    path('category/<slug:category>/', posts_by_category, name='posts_by_category'),
+    path('category/<slug:category>/', PostsByCategoryListView.as_view(), name='posts_by_category'),
     
     # Маршрут для предпросмотра поста
     path('preview/', PreviewPostView.as_view(), name='preview_post'),

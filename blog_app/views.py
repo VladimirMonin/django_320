@@ -220,20 +220,29 @@ class PostsByTagListView(ListView):
         return context
 
 
+class PostsByCategoryListView(ListView):
+    model = Post
+    template_name = 'blog_app/blog.html'
+    context_object_name = 'posts'
+    paginate_by = 4
 
+    def get_queryset(self):
+        category = self.kwargs['category']
+        return Post.objects.select_related('author', 'category')\
+                         .prefetch_related('tags', 'comments')\
+                         .filter(category__slug=category, status='published')
 
-def posts_by_category(request, category):
-    """
-    Функция представления для отображения страницы постов с определенной категорией.
-    """
-    context = {
-        # Можно получить все посты со стороны тега, используя related_name posts в модели Tag
-        # Tag.objects.get(slug=tag).posts.all()
-        "posts": Category.objects.get(slug=category).posts.all(),
-        "menu": menu,
-        "page_alias": "blog",
-    }
-    return render(request, "blog_app/blog.html", context=context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['page_alias'] = 'blog'
+        context['breadcrumbs'] = [
+            {'name': 'Главная', 'url': reverse('main')},
+            {'name': 'Блог', 'url': reverse('blog')},
+            {'name': Category.objects.get(slug=self.kwargs['category']).name}
+        ]
+        return context
+
 
 
 

@@ -1,22 +1,17 @@
-from django.shortcuts import render, HttpResponse, get_object_or_404
-from .dataset import dataset
-from .models import Post, Tag, Category
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import F, Q
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .templatetags.md_to_html import markdown_to_html
-from .forms import CommentForm, CategoryForm, TagForm, PostForm
-from django.shortcuts import render, redirect
-from .models import Post, Tag
-from django.contrib import messages
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse, reverse_lazy
-# Декоратор для ограничения доступа к определенным страницам - @login_required, @permission_required
-from django.contrib.auth.decorators import login_required, permission_required
-from django.views.generic import View, TemplateView, CreateView, UpdateView, ListView, DetailView, DeleteView
-
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View, TemplateView, CreateView, UpdateView, ListView, DetailView
+from django.views.generic.edit import FormMixin
+from .forms import CommentForm, CategoryForm, TagForm, PostForm
+from .models import Post, Tag, Category
+from .templatetags.md_to_html import markdown_to_html
 
 menu = [
     {"name": "Главная", "alias": "main"},
@@ -68,60 +63,67 @@ class BlogView(ListView):
         return context
 
 
+class PostDetailView(FormMixin, DetailView):
+    model = Post
+    template_name = 'blog_app/post_detail.html'
+    context_object_name = 'post'
+    form_class = CommentForm
 
+    def get_success_url(self):
+        return reverse('post_by_slug', kwargs={'slug': self.object.slug})
 
-def post_by_slug(request, post_slug):
-    post = get_object_or_404(Post, slug=post_slug)
-    breadcrumbs = [
-        {'name': 'Главная', 'url': reverse('main')},
-        {'name': 'Блог', 'url': reverse('blog')},
-        {'name': post.title}
-    ]
+    def get_object(self, queryset=None):
+        post = super().get_object(queryset)
+        session_key = f'post_{post.id}_viewed'
+        if not self.request.session.get(session_key, False):
+            Post.objects.filter(id=post.id).update(views=F('views') + 1)
+            self.request.session[session_key] = True
+            post.refresh_from_db()
+        return post
 
-    if f'post_{post.id}_viewed' not in request.session:
-        Post.objects.filter(id=post.id).update(views=F('views') + 1)
-        request.session[f'post_{post.id}_viewed'] = True
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        comments_list = self.object.comments.filter(status='accepted').order_by('created_at')
+        paginator = Paginator(comments_list, 20)
+        page_number = self.request.GET.get('page')
 
-    post.refresh_from_db()  # Обновляем объект post после изменения
+        try:
+            comments_page = paginator.page(page_number)
+        except PageNotAnInteger:
+            comments_page = paginator.page(1)
+        except EmptyPage:
+            comments_page = paginator.page(paginator.num_pages)
 
-    if request.method == 'POST':
-        if request.user.is_authenticated:
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                # Создаем комментарий, но пока не сохраняем в базу
-                comment = form.save(commit=False)
-                comment.post = post
-                comment.author = request.user
-                comment.status = 'unchecked'  # Устанавливаем статус "Не проверен"
-                comment.save()
-                messages.success(request, 'Ваш комментарий находится на модерации.')
-                return redirect('post_by_slug', post_slug=post_slug)
-        else:
+        context['comments'] = comments_page
+        context['form'] = self.get_form()
+        context['menu'] = menu
+        # Добавьте breadcrumbs, если они вам нужны:
+        context['breadcrumbs'] = [
+            {'name': 'Главная', 'url': reverse('main')},
+            {'name': 'Блог', 'url': reverse('blog')},
+            {'name': self.object.title}
+        ]
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
             messages.error(request, 'Для добавления комментария необходимо войти в систему.')
             return redirect('login')
-    else:
-        form = CommentForm()
 
-    # Пагинация комментариев
-    comments_list = post.comments.filter(status='accepted').order_by('created_at')
-    paginator = Paginator(comments_list, 20)  # 5 комментариев на страницу
-    page_number = request.GET.get('page')
+        self.object = self.get_object()
+        form = self.get_form()
 
-    try:
-        comments_page = paginator.page(page_number)
-    except PageNotAnInteger:
-        comments_page = paginator.page(1)
-    except EmptyPage:
-        comments_page = paginator.page(paginator.num_pages)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = self.object
+            comment.author = request.user
+            comment.status = 'unchecked'
+            comment.save()
+            messages.success(request, 'Ваш комментарий находится на модерации.')
+            return redirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
 
-    context = {
-        'post': post,
-        'form': form,
-        'comments': comments_page,
-        'breadcrumbs': breadcrumbs,
-    }
-
-    return render(request, 'blog_app/post_detail.html', context)
 
 
 class IdexView(TemplateView):

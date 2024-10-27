@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from blog_app.views import index, AboutView, IdexView
+from blog_app.views import AboutView, IdexView
 from django.conf.urls.static import static
 from django.conf import settings
 

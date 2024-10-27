@@ -25,9 +25,9 @@
         {# Отображение полей формы #}
         {{ form.as_p }}
         {# Кнопка отправки формы #}
-        <button type="submit" class="btn btn-primary">{{ submit_button_text }}</button>
+        <button type="submit" class="btn btn-dark">{{ submit_button_text }}</button>
         {# Кнопка отмены, ведущая на страницу категории #}
-        <a href="{% url 'posts_by_category' category.slug %}" class="btn btn-secondary">Отмена</a>
+        <a href="{% url 'blog' %}" class="btn btn-secondary">Отмена</a>
     </form>
 </div>
 {% endblock %}

@@ -139,8 +139,8 @@ LOGIN_URL = 'login'  # URL страницы входа
 
 # Настройки бекендов для аутентификации
 AUTHENTICATION_BACKENDS = [
-    'users.authentication.EmailAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    'users.authentication.EmailAuthBackend', # Наш бекенд для входа по email
+    'django.contrib.auth.backends.ModelBackend', # Стандартный вход через username
 ]
 
 # Пользовательская модель пользователя

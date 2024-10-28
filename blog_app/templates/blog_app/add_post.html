@@ -13,7 +13,7 @@
           Форма поста
         </div>
         <div class="card-body">
-          <form method="POST" enctype="multipart/form-data">
+          <form method="POST" enctype="multipart/form-data" id="post-form" novalidate>
             {% csrf_token %}
             {% for field in form %}
               <div class="mb-3">
@@ -26,6 +26,11 @@
                 {% endif %}
               </div>
             {% endfor %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+            {% endif %}
             <button type="submit" class="btn btn-dark">Отправить</button>
           </form>
         </div>
@@ -38,3 +43,4 @@
 {% block scripts %}
 <script src="{% static 'js/editor.js' %}"></script>
 {% endblock %}
+

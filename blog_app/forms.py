@@ -86,7 +86,7 @@ class PostForm(forms.ModelForm):
         fields = ['title', 'text', 'category', 'tags', 'cover_image']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'id': 'id_text', 'required': False}),
             'tags': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите теги через запятую'}),
             'cover_image': forms.FileInput(attrs={'class': 'form-control'}),
         }

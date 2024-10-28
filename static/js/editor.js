@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 'preview', 'side-by-side', 'fullscreen'
             ],
             previewRender: function(plainText, preview) {
-                // Асинхронно обновляем содержимое предпросмотра
                 fetch('/blog/preview/', {
                     method: 'POST',
                     headers: {
@@ -32,15 +31,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     preview.innerHTML = data.html;
-                    // Подсветка синтаксиса
                     hljs.highlightAll();
                 })
                 .catch(error => {
                     console.error('Ошибка при получении предпросмотра:', error);
                     preview.innerHTML = "<p class='text-danger'>Ошибка при загрузке предпросмотра</p>";
                 });
-                return "Загрузка предпросмотра..."; // Пока загружается, отображаем это сообщение
+                return "Загрузка предпросмотра...";
             }
         });
+
+        // Добавляем обработчик отправки формы
+        const form = document.getElementById('post-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Синхронизируем значение редактора с textarea перед отправкой
+                textArea.value = easyMDE.value();
+                
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = response.url;
+                        return;
+                    }
+                    throw new Error('Ошибка при отправке формы');
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+            });
+        }
     }
 });

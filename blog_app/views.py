@@ -12,6 +12,7 @@ from django.views.generic.edit import FormMixin
 from .forms import CommentForm, CategoryForm, TagForm, PostForm
 from .models import Post, Tag, Category
 from .templatetags.md_to_html import markdown_to_html
+import json
 
 menu = [
     {"name": "Главная", "alias": "main"},
@@ -170,34 +171,46 @@ class AboutView(View):
 
         })    
 
-@login_required
-def add_post(request):
-    if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=True, author=request.user)
-            messages.success(request, 'Пост успешно создан и отправлен на модерацию.')
-            return redirect('add_post')
-    else:
-        form = PostForm()
+class AddPostView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog_app/add_post.html'
+    success_url = reverse_lazy('add_post')
 
-    return render(request, 'blog_app/add_post.html', {'form': form, 'menu': menu})
+    def form_valid(self, form):
+        # Сохраняем форму с указанием автора
+        self.object = form.save(commit=True, author=self.request.user)
+        # Добавляем сообщение об успехе
+        messages.success(self.request, 'Пост успешно создан и отправлен на модерацию.')
+        return super().form_valid(form)
 
 
-@login_required
-def update_post(request, post_slug):
-    post = get_object_or_404(Post, slug=post_slug)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        return context
 
-    if request.method == "POST":
-        form = PostForm(request.POST, request.FILES, instance=post)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Пост успешно обновлен и отправлен на модерацию.')
-            return redirect('update_post', post_slug=post_slug)
-    else:
-        form = PostForm(instance=post)
-    return render(request, 'blog_app/add_post.html', {'form': form, 'menu': menu})
+class UpdatePostView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog_app/add_post.html'
 
+    def get_object(self, queryset=None):
+        # Получаем объект поста по slug
+        return get_object_or_404(Post, slug=self.kwargs['post_slug'])
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Пост успешно обновлен и отправлен на модерацию.')
+        return response
+
+    def get_success_url(self):
+        return reverse_lazy('update_post', kwargs={'post_slug': self.object.slug})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        return context
 
 class PostsByTagListView(ListView):
     """

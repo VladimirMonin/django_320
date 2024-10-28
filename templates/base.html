@@ -42,7 +42,7 @@ templates/base.html
     <main>
       {% block content %}{% endblock %}
     </main>
-
+    {% comment %} Контейнер для сообщений от Django {% endcomment %}
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
       {% if messages %}
           {% for message in messages %}
@@ -55,6 +55,21 @@ templates/base.html
                   </div>
               </div>
           {% endfor %}
+      {% endif %}
+    </div>
+    {% comment %} Контейнер оповещений JS {% endcomment %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="toast align-items-center text-white bg-{{ message.tags }} border-0 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body">
+                {{ message }}
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+        {% endfor %}
       {% endif %}
     </div>
 

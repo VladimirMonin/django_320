@@ -34,22 +34,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     hljs.highlightAll();
                 })
                 .catch(error => {
-                    console.error('Ошибка при получении предпросмотра:', error);
                     preview.innerHTML = "<p class='text-danger'>Ошибка при загрузке предпросмотра</p>";
                 });
                 return "Загрузка предпросмотра...";
             }
         });
 
-        // Добавляем обработчик отправки формы
         const form = document.getElementById('post-form');
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
-                // Синхронизируем значение редактора с textarea перед отправкой
                 textArea.value = easyMDE.value();
-                
                 const formData = new FormData(form);
 
                 fetch(form.action, {
@@ -60,16 +55,59 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })
                 .then(response => {
-                    if (response.ok) {
-                        window.location.href = response.url;
-                        return;
+                    if (!response.ok) {
+                        throw new Error('Ошибка сети');
                     }
-                    throw new Error('Ошибка при отправке формы');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const toastElement = document.createElement('div');
+                        toastElement.className = 'toast align-items-center text-white bg-success border-0';
+                        toastElement.setAttribute('role', 'alert');
+                        toastElement.setAttribute('aria-live', 'assertive');
+                        toastElement.setAttribute('aria-atomic', 'true');
+                        
+                        toastElement.innerHTML = `
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    ${data.message}
+                                </div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                            </div>
+                        `;
+                        
+                        document.querySelector('.toast-container').appendChild(toastElement);
+                        const toast = new bootstrap.Toast(toastElement);
+                        toast.show();
+                        
+                        if (data.redirect_url) {
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url;
+                            }, 1000);
+                        }
+                    }
                 })
                 .catch(error => {
-                    console.error('Ошибка:', error);
+                    const toastElement = document.createElement('div');
+                    toastElement.className = 'toast align-items-center text-white bg-danger border-0';
+                    toastElement.setAttribute('role', 'alert');
+                    toastElement.setAttribute('aria-live', 'assertive');
+                    toastElement.setAttribute('aria-atomic', 'true');
+                    
+                    toastElement.innerHTML = `
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                Произошла ошибка при сохранении поста
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    `;
+                    
+                    document.querySelector('.toast-container').appendChild(toastElement);
+                    const toast = new bootstrap.Toast(toastElement);
+                    toast.show();
                 });
             });
         }
-    }
-});
+    }});

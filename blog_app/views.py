@@ -175,15 +175,21 @@ class AddPostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'blog_app/add_post.html'
-    success_url = reverse_lazy('add_post')
 
     def form_valid(self, form):
-        # Сохраняем форму с указанием автора
         self.object = form.save(commit=True, author=self.request.user)
-        # Добавляем сообщение об успехе
-        messages.success(self.request, 'Пост успешно создан и отправлен на модерацию.')
-        return super().form_valid(form)
+        return JsonResponse({
+            'success': True,
+            'message': 'Пост успешно создан',
+            'redirect_url': reverse('blog')
+        })
 
+    def form_invalid(self, form):
+        return JsonResponse({
+            'success': False,
+            'message': 'Ошибка в форме',
+            'errors': form.errors
+        }, status=400)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -196,21 +202,28 @@ class UpdatePostView(LoginRequiredMixin, UpdateView):
     template_name = 'blog_app/add_post.html'
 
     def get_object(self, queryset=None):
-        # Получаем объект поста по slug
         return get_object_or_404(Post, slug=self.kwargs['post_slug'])
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, 'Пост успешно обновлен и отправлен на модерацию.')
-        return response
+        self.object = form.save()
+        return JsonResponse({
+            'success': True,
+            'message': 'Пост успешно обновлен',
+            'redirect_url': reverse('post_by_slug', kwargs={'slug': self.object.slug})
+        })
 
-    def get_success_url(self):
-        return reverse_lazy('update_post', kwargs={'post_slug': self.object.slug})
+    def form_invalid(self, form):
+        return JsonResponse({
+            'success': False,
+            'message': 'Ошибка в форме',
+            'errors': form.errors
+        }, status=400)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['menu'] = menu
         return context
+
 
 class PostsByTagListView(ListView):
     """

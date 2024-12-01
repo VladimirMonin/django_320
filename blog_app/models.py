@@ -112,7 +112,6 @@ class Tag(models.Model):
 
 
 class Comment(models.Model):
-
     STATUS_CHOICES = (
         ("unchecked", "Не проверен"),
         ("accepted", "Проверен"),
@@ -123,6 +122,16 @@ class Comment(models.Model):
     status = models.CharField(
         max_length=12, choices=STATUS_CHOICES, default="unchecked"
     )
+    
+    # Добавляем поле для связи родитель-потомок
+    parent = models.ForeignKey(
+        'self', # Ссылка на саму себя
+        null=True,
+        blank=True,
+        related_name='replies', # Ответы на комментарий
+        on_delete=models.CASCADE, # Удаление дочерних комментариев при удалении родительского
+        verbose_name="Родительский комментарий"
+    )
 
     author = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE, verbose_name="Автор", related_name='comments'
@@ -132,3 +141,15 @@ class Comment(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+
+    def is_parent(self):
+        """Проверяет, является ли комментарий родительским
+        Это позволяет различать родительский комментарий и ответы на него
+        """
+        return self.parent is None
+
+    def get_replies(self):
+        """Получает все ответы на комментарий
+        Это позволяет отображать ответы на комментарий в правильном порядке
+        """
+        return self.replies.filter(status='accepted').order_by('created_at')

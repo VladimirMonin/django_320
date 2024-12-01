@@ -423,8 +423,12 @@ class AddTagView(LoginRequiredMixin, CreateView):
 
 
 
-class LikePostView(View):
-    @method_decorator(login_required)
+class LikePostView(LoginRequiredMixin, View):
+
+    # Маршрут для авторизации псевдоним login
+    # login_url = 'users/login/'
+    # login_url = reverse_lazy('login')
+    #TODO Сделать работающим перенаправление!
     def post(self, request, slug):
         post = get_object_or_404(Post, slug=slug)
         user = request.user

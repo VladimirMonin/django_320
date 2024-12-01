@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from django.urls import reverse_lazy
 from dotenv import load_dotenv
 
 load_dotenv() # загрузка переменных окружения из файла .env
@@ -135,7 +136,7 @@ INTERNAL_IPS = [
 ]
 
 LOGIN_REDIRECT_URL = 'main'  # Перенаправление после успешного входа
-LOGIN_URL = 'login'  # URL страницы входа
+LOGIN_URL = reverse_lazy('login')  # URL для входа
 
 # Настройки бекендов для аутентификации
 AUTHENTICATION_BACKENDS = [

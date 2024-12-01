@@ -849,19 +849,19 @@ popular_posts = Post.objects.filter(views__gt=100)
 ```
 
 4. Посты где есть тег Python
-<!-- TODO Вхождение в тег? -->
+
 ```python
 tag_name = 'python'
 tagged_posts = Post.objects.filter(tags__name=tag_name)
 ```
 
-5. По году
+1. По году
 ```python
 year = 2024
 posts_from_year = Post.objects.filter(created_at__year=year)
 ```
 
-6. Получить посты с комментами:
+1. Получить посты с комментами:
 
 ```python
 posts_with_comments = Post.objects.filter(comment__isnull=False).distinct()

@@ -1,19 +1,42 @@
 {% load md_to_html %}
 
-{# Проверка, является ли текущий пользователь автором комментария #}
-{% if user == comment.author %}
-<div class="comment user-comment mb-3 p-3 rounded">
-{% else %}
-<div class="comment other-comment mb-3 p-3 rounded">
-{% endif %}
-  <div class="d-flex justifyсят-between align-items-center mb-2">
-    {# Отображение имени автора комментария #}
-    <h6 class="mb-0"><i class="bi bi-person-fill me-1"></i>{{ comment.author.username }}</h6>
-    {# Отображение даты и времени создания комментария #}
-    <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ comment.created_at|date:"d M Y H:i" }}</small>
-  </div>
-  {# Преобразование текста комментария из Markdown в HTML с подсветкой синтаксиса #}
-  <div class="mb-0">
-    {% md_to_html comment.text %}
-  </div>
+<div class="comment {% if user == comment.author %}user-comment{% else %}other-comment{% endif %} {% if not comment.is_parent %}reply{% endif %} mb-3 p-3 rounded">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0">
+            <i class="bi bi-person-fill me-1"></i>{{ comment.author.username }}
+            {% if comment.parent %}
+                <span class="reply-to">→ {{ comment.parent.author.username }}</span>
+            {% endif %}
+        </h6>
+        <small class="text-muted">
+            <i class="bi bi-clock me-1"></i>{{ comment.created_at|date:"d M Y H:i" }}
+        </small>
+    </div>
+    
+    <div class="mb-2">
+        {% md_to_html comment.text %}
+    </div>
+
+    {% if comment.get_replies %}
+        <div class="comment-replies mt-3">
+            {% for reply in comment.get_replies %}
+                {% include 'blog_app/comment.html' with comment=reply %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <button class="btn btn-sm btn-link reply-button" data-comment-id="{{ comment.id }}">
+      <i class="bi bi-reply"></i> Ответить
+  </button>
+        <div id="reply-form-{{ comment.id }}" class="reply-form">
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                {{ form.text }}
+                <button type="submit" class="btn btn-sm btn-dark mt-2">Отправить</button>
+                <button type="button" class="btn btn-sm btn-light mt-2" onclick="hideReplyForm('{{ comment.id }}')">Отмена</button>
+            </form>
+        </div>
+    {% endif %}
 </div>

@@ -40,8 +40,32 @@ document.addEventListener('DOMContentLoaded', function() {
                     .catch(error => console.error('Ошибка при загрузке страницы:', error));
                 }
             });
-        });
+        });  
     }
+
+// Функции для показа/скрытия формы ответа
+function showReplyForm(commentId) {
+    document.getElementById(`reply-form-${commentId}`).style.display = 'block';
+}
+
+function hideReplyForm(commentId) {
+    document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+}
+
+// Основной код после загрузки DOM
+document.addEventListener('DOMContentLoaded', function() {
+    // Код для пагинации
+    attachPaginationLinks();
+    
+    // Добавляем обработчики для всех кнопок ответа
+    document.querySelectorAll('.reply-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            showReplyForm(commentId);
+        });
+    });
+});
+
 
     // Инициализируем обработчики при первой загрузке страницы
     attachPaginationLinks();

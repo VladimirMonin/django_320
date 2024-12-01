@@ -172,39 +172,50 @@ pre, code {
     background-color: rgba(255, 193, 7, 0.865); /* Полупрозрачный желтый фон */
 }
 
-/* Стили для комментариев в стиле чата */
+/* Стили для комментариев */
 .comment {
-  max-width: 75%;
   padding: 1rem;
   border-radius: 0.5rem;
   margin-bottom: 1rem;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 /* Стиль для комментария пользователя */
 .user-comment {
-  margin-left: auto;
   background-color: #d1e7dd;
   border: 1px solid #badbcc;
 }
 
 /* Стиль для комментария другого пользователя */
 .other-comment {
-  margin-right: auto;
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;
 }
 
-/* Стиль для имени автора комментария */
-.comment h6 {
-  font-weight: bold;
+/* Стили для ответов */
+.comment.reply {
+  margin-left: 2rem;
+  padding-left: 1rem;
+  border-left: 2px solid #dee2e6;
 }
 
-/* Стиль для текста комментария */
-.comment p {
-  margin-bottom: 0;
+/* Стиль для кнопки ответа */
+.reply-button {
+  color: #6c757d;
+  padding: 0;
+  border: none;
+  background: none;
 }
 
-/* Стиль для иконки пользователя в комментарии */
-.comment .bi-person-fill {
-  color: #343a40;
+/* Форма ответа */
+.reply-form {
+  display: none;
+  margin-top: 0.5rem;
+}
+
+/* Индикатор "кому отвечаем" */
+.reply-to {
+  color: #6c757d;
+  font-size: 0.9em;
 }

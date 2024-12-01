@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View, TemplateView, CreateView, UpdateView, ListView, DetailView
 from django.views.generic.edit import FormMixin
 from .forms import CommentForm, CategoryForm, TagForm, PostForm
-from .models import Post, Tag, Category
+from .models import Post, Tag, Category, Comment
 from .templatetags.md_to_html import markdown_to_html
 import json
 

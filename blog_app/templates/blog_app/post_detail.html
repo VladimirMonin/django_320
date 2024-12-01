@@ -76,18 +76,31 @@
     {% md_to_html post.text %}
   </div>
 
-  <!-- Теги -->
-  <div class="mb-4">
-    <h5>Теги:</h5>
-    <div class="d-flex flex-wrap">
-      <!-- Отображение всех тегов поста -->
-      {% for tag in post.tags.all %}
-        <a href="{{ tag.get_absolute_url }}" class="badge bg-secondary me-2 mb-2 text-decoration-none">
-          #{{ tag.name }}
-        </a>
-      {% endfor %}
-    </div>
+<!-- Теги -->
+<div class="mb-4">
+  <h5>Теги:</h5>
+  <div class="d-flex flex-wrap">
+    <!-- Отображение всех тегов поста -->
+    {% for tag in post.tags.all %}
+      <a href="{{ tag.get_absolute_url }}" class="badge bg-secondary me-2 mb-2 text-decoration-none">
+        #{{ tag.name }}
+      </a>
+    {% endfor %}
   </div>
+</div>
+
+<!-- Кнопка лайка -->
+<div class="mb-4 d-flex align-items-center"><button id="like-button" 
+  class="btn {% if user.is_authenticated and user in post.likes.all %}liked{% else %}not-liked{% endif %}" 
+  data-slug="{{ post.slug }}"
+  {% if user.is_authenticated %}data-authenticated{% endif %}>
+<i class="bi {% if user.is_authenticated and user in post.likes.all %}bi-hand-thumbs-up-fill{% else %}bi-hand-thumbs-up{% endif %}"></i>
+</button>
+
+  <!-- Отображение количества лайков -->
+  <span id="likes-count" class="ms-2">{{ post.likes.count }}</span> лайков
+</div>
+
   <!-- Разделитель -->
   <hr class="my-4">
   <!-- Комментарии -->

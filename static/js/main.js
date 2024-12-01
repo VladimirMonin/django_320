@@ -70,3 +70,62 @@ document.addEventListener('DOMContentLoaded', function() {
     // Инициализируем обработчики при первой загрузке страницы
     attachPaginationLinks();
 });
+
+// Обработчик кнопки лайка
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButton = document.getElementById('like-button');
+    
+    if (likeButton) {
+        likeButton.addEventListener('click', function() {
+            const postSlug = this.getAttribute('data-slug');
+            const isAuthenticated = this.hasAttribute('data-authenticated');
+            
+            if (!isAuthenticated) {
+                window.location.href = '/login/?next=' + window.location.pathname;
+                return;
+            }
+
+            fetch(`/blog/${postSlug}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Обновляем состояние кнопки
+                if (data.liked) {
+                    this.classList.remove('not-liked');
+                    this.classList.add('liked');
+                    this.querySelector('i').classList.remove('bi-hand-thumbs-up');
+                    this.querySelector('i').classList.add('bi-hand-thumbs-up-fill');
+                } else {
+                    this.classList.remove('liked');
+                    this.classList.add('not-liked');
+                    this.querySelector('i').classList.remove('bi-hand-thumbs-up-fill');
+                    this.querySelector('i').classList.add('bi-hand-thumbs-up');
+                }
+                
+                // Обновляем счетчик лайков
+                document.getElementById('likes-count').textContent = data.likes_count;
+            });
+        });
+    }
+});
+
+// Функция получения CSRF-токена
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

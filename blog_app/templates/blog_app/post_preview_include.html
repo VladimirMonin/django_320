@@ -31,10 +31,15 @@
                     <small class="text-muted me-2">
                         <i class="bi bi-chat-left"></i> {{ post.comments.count }}
                     </small>
+                    <small class="text-muted me-2">
+                        <i class="bi bi-hand-thumbs-up{% if user.is_authenticated and user in post.likes.all %}-fill{% endif %}"></i>
+                        {{ post.likes.count }}
+                    </small>
                     <small class="text-muted">
                         <i class="bi bi-calendar"></i> {{ post.created_at|date:"d M Y" }}
                     </small>
                 </div>
+                
                 {% comment %} Отображение категории поста {% endcomment %}
                 <p class="card-text mb-2">
                     {% if post.category %}

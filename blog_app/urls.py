@@ -10,6 +10,7 @@ from .views import (
     AddTagView,
     UpdateCategoryView,
     PreviewPostView,
+    LikePostView
 )
 
 urlpatterns = [
@@ -30,4 +31,7 @@ urlpatterns = [
 
     # Маршрут для предпросмотра поста
     path('preview/', PreviewPostView.as_view(), name='preview_post'),
+
+    # Лайки
+    path('<slug:slug>/like/', LikePostView.as_view(), name='like_post'),
 ]

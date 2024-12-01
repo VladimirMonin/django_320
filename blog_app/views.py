@@ -13,6 +13,8 @@ from .forms import CommentForm, CategoryForm, TagForm, PostForm
 from .models import Post, Tag, Category, Comment
 from .templatetags.md_to_html import markdown_to_html
 import json
+from django.utils.decorators import method_decorator
+
 
 menu = [
     {"name": "Главная", "alias": "main"},
@@ -417,4 +419,24 @@ class AddTagView(LoginRequiredMixin, CreateView):
         # Добавляем сообщение об ошибке
         messages.error(self.request, "Ошибка при добавлении тега. Проверьте введенные данные.")
         return super().form_invalid(form)
-    
+
+
+
+
+class LikePostView(View):
+    @method_decorator(login_required)
+    def post(self, request, slug):
+        post = get_object_or_404(Post, slug=slug)
+        user = request.user
+
+        if post.likes.filter(id=user.id).exists():
+            # Пользователь уже лайкнул пост, удаляем лайк
+            post.likes.remove(user)
+            liked = False
+        else:
+            # Пользователь еще не лайкнул пост, добавляем лайк
+            post.likes.add(user)
+            liked = True
+
+        # Возвращаем обновленные данные о лайках
+        return JsonResponse({'liked': liked, 'likes_count': post.likes.count()})

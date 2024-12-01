@@ -32,6 +32,7 @@ class Post(models.Model):
     tags = models.ManyToManyField(
         "Tag", related_name="posts", blank=True, verbose_name="Теги"
     )
+    likes = models.ManyToManyField(get_user_model(), related_name='liked_posts', blank=True, verbose_name='Лайки')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     views = models.IntegerField(default=0, verbose_name="Просмотры")

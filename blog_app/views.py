@@ -73,18 +73,14 @@ class PostDetailView(FormMixin, DetailView):
     def get_success_url(self):
         return reverse('post_by_slug', kwargs={'slug': self.object.slug})
 
-    def get_object(self, queryset=None):
-        post = super().get_object(queryset)
-        session_key = f'post_{post.id}_viewed'
-        if not self.request.session.get(session_key, False):
-            Post.objects.filter(id=post.id).update(views=F('views') + 1)
-            self.request.session[session_key] = True
-            post.refresh_from_db()
-        return post
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        comments_list = self.object.comments.filter(status='accepted').order_by('created_at')
+        # Получаем только родительские комментарии
+        comments_list = self.object.comments.filter(
+            status='accepted',
+            parent=None
+        ).order_by('created_at')
+        
         paginator = Paginator(comments_list, 20)
         page_number = self.request.GET.get('page')
 
@@ -98,7 +94,6 @@ class PostDetailView(FormMixin, DetailView):
         context['comments'] = comments_page
         context['form'] = self.get_form()
         context['menu'] = menu
-        # Добавьте breadcrumbs, если они вам нужны:
         context['breadcrumbs'] = [
             {'name': 'Главная', 'url': reverse('main')},
             {'name': 'Блог', 'url': reverse('blog')},
@@ -119,6 +114,15 @@ class PostDetailView(FormMixin, DetailView):
             comment.post = self.object
             comment.author = request.user
             comment.status = 'unchecked'
+            
+            # Обработка родительского комментария
+            parent_id = request.POST.get('parent_id')
+            if parent_id:
+                parent_comment = Comment.objects.get(id=parent_id)
+                # Проверяем, что родительский комментарий не является ответом
+                if parent_comment.is_parent():
+                    comment.parent = parent_comment
+            
             comment.save()
             messages.success(request, 'Ваш комментарий находится на модерации.')
             return redirect(self.get_success_url())

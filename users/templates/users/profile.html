@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль - {{ object.username }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">{{ object.username }}</h2>
+            {% if object.photo %}
+                <img src="{{ object.photo.url }}" alt="Фото профиля" class="img-thumbnail mb-3" style="max-width: 200px;">
+            {% endif %}
+            
+            <p>Email: {{ object.email }}</p>
+            {% if object.date_birth %}
+                <p>Дата рождения: {{ object.date_birth|date:"d.m.Y" }}</p>
+            {% endif %}
+
+            {% if is_owner %}
+                <hr>
+                <h4>Настройки уведомлений</h4>
+                {% if is_subscribed %}
+                    <div class="alert alert-success">
+                        Вы подписаны на уведомления в Telegram
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        Подписаться на уведомления: 
+                        <a href="{{ bot_link }}" target="_blank" class="btn btn-primary">
+                            Подключить Telegram бота
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

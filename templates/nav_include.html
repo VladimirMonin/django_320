@@ -11,12 +11,12 @@
     {% if user.is_authenticated %}
       {# Отображение имени пользователя и кнопки выхода для авторизованных пользователей #}
       <span class="navbar-text me-3">
-        {{ user.username }}
-      </span>
-      <form method="post" action="{% url 'logout' %}" class="d-inline">
+        <a href="{% url 'profile' user.id %}" class="text-decoration-none">{{ user.username }}</a>
+    </span>
+    <form method="post" action="{% url 'logout' %}" class="d-inline">
         {% csrf_token %}
         <button type="submit" class="btn btn-link nav-link p-0 m-0 align-baseline">Выйти</button>
-      </form>
+    </form>
     {% else %}
       {# Ссылки на вход и регистрацию для неавторизованных пользователей #}
       <a class="nav-link me-3" href="{% url 'login' %}">Вход</a>

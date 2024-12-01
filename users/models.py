@@ -7,7 +7,7 @@ class User(AbstractUser):
     date_birth = models.DateTimeField(blank=True, null=True, verbose_name='Дата рождения')
     github_id = models.CharField(max_length=255, blank=True, null=True)
     vk_id = models.CharField(max_length=255, blank=True, null=True)
-    tg_chat_id = models.CharField(max_length=255, blank=True, null=True, verbose_name='Telegram Chat ID')
+    tg_chat_id = models.CharField(max_length=255, blank=True, null=True, default=None, verbose_name='ID телеграм-чата')
     uuid = models.UUIDField(default=uuid.uuid4, blank=True, null=True)
 
     def __str__(self):
